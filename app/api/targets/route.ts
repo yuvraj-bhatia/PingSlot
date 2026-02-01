@@ -1,24 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  mockTargets,
-  createMockTarget,
-} from "../../../lib/fixtures";
+import { listTargets, createTarget } from "../../../lib/backend";
 import { CreateTargetInputSchema } from "../../../lib/apiTypes";
 
 /**
  * GET /api/targets
- * List all targets with summaries.
+ * List all targets with their current status.
+ * 
+ * Response:
+ * {
+ *   targets: TargetSummary[]
+ * }
  */
 export async function GET() {
-  // Simulate network latency
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  return NextResponse.json({ targets: mockTargets });
+  try {
+    const targets = await listTargets();
+    return NextResponse.json({ targets });
+  } catch (error) {
+    console.error("[API] Failed to list targets:", error);
+    return NextResponse.json(
+      { 
+        error: "Failed to list targets",
+        message: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
+    );
+  }
 }
 
 /**
  * POST /api/targets
- * Create a new target.
+ * Create a new monitoring target.
+ * 
+ * Request body:
+ * {
+ *   name: string;
+ *   bookingUrl: string;
+ *   type?: "acuity" | "generic" | "unknown";
+ *   requirementsUrl?: string;
+ *   alertEmail: string;
+ *   active?: boolean;
+ * }
+ * 
+ * Response:
+ * { target: TargetSummary }
  */
 export async function POST(request: NextRequest) {
   try {
@@ -36,16 +60,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Simulate network latency
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
     // Create target
-    const target = createMockTarget(result.data);
+    const target = await createTarget({
+      name: result.data.name,
+      bookingUrl: result.data.bookingUrl,
+      type: result.data.type,
+      requirementsUrl: result.data.requirementsUrl,
+      alertEmail: result.data.alertEmail,
+      active: result.data.active,
+    });
 
     return NextResponse.json({ target }, { status: 201 });
   } catch (error) {
+    console.error("[API] Failed to create target:", error);
     return NextResponse.json(
-      { error: "Failed to create target" },
+      { 
+        error: "Failed to create target",
+        message: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }

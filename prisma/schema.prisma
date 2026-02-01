@@ -1,0 +1,151 @@
+// PingSlot - Appointment Monitoring & Alerting
+// Database schema for monitoring public appointment pages
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Target Registry
+// Stores what to monitor - each target explicitly defines how it should be parsed
+// ============================================================================
+
+model Target {
+  id              String   @id @default(cuid())
+  name            String
+  bookingUrl      String   @unique @map("booking_url")
+  
+  // Platform type for adapter selection
+  platform        String   @default("unknown") // "acuity" | "microsoft" | "generic" | "unknown"
+  
+  // Appointment type for filtering
+  appointmentType String   @default("generic") @map("appointment_type") // "passport" | "consulate" | "city_planning" | "dmv" | "generic"
+  
+  // Location fields for filtering
+  country         String?  // e.g., "USA", "India"
+  state           String?  // e.g., "California", "New York"
+  city            String?  // e.g., "San Francisco", "Los Angeles"
+  
+  // Legacy field - kept for compatibility
+  type            String   @default("unknown") // "acuity" | "generic" | "unknown"
+  
+  requirementsUrl String?  @map("requirements_url")
+  alertEmail      String   @map("alert_email")
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Cached requirements (extracted once, reused)
+  requirementsBullets String? @map("requirements_bullets") // JSON array stored as string
+  requirementsHash    String? @map("requirements_hash") // Hash to detect if PDF changed
+
+  // Relations
+  checks Check[]
+  alerts Alert[]
+
+  @@map("targets")
+}
+
+// ============================================================================
+// Checks
+// Stores every run for observability and debugging
+// ============================================================================
+
+model Check {
+  id          String   @id @default(cuid())
+  targetId    String   @map("target_id")
+  status      String   // "available" | "unavailable" | "unknown" | "error"
+  nextSlotTime DateTime? @map("next_slot_time")
+  bookingLink String?  @map("booking_link")
+  checkedAt   DateTime @default(now()) @map("checked_at")
+  rawText     String?  @map("raw_text") // Debug info
+  errorMessage String? @map("error_message")
+
+  // Relation
+  target Target @relation(fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([targetId, checkedAt])
+  @@map("checks")
+}
+
+// ============================================================================
+// Alerts
+// Stores only sent emails - proves why an email was sent or not
+// ============================================================================
+
+model Alert {
+  id          String   @id @default(cuid())
+  targetId    String   @map("target_id")
+  dedupeHash  String   @map("dedupe_hash") // target_id + ":" + nextSlotTime
+  sentTo      String   @map("sent_to")
+  sentAt      DateTime @default(now()) @map("sent_at")
+  nextSlotTime DateTime? @map("next_slot_time")
+  emailId     String?  @map("email_id") // Resend email ID for tracking
+
+  // Relation
+  target Target @relation(fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([dedupeHash])
+  @@index([targetId, sentAt])
+  @@map("alerts")
+}
+
+// ============================================================================
+// User Settings
+// Global configuration for the appointment monitoring system
+// Single-user system - only one row should exist with id = "default"
+// ============================================================================
+
+model UserSettings {
+  id                          String  @id @default("default")
+  
+  // Email Configuration
+  // WHERE alerts are sent - can be different from target-specific emails
+  alertEmail                  String  @default("demo@example.com") @map("alert_email")
+  
+  // Appointment Type Filtering
+  // JSON array of types to monitor: ["dmv", "passport", "consulate", "city_planning"]
+  // Empty array = monitor all types
+  appointmentTypes            String  @default("[]") @map("appointment_types")
+  
+  // Location Filtering
+  // JSON array of US state names to prioritize: ["California", "New York"]
+  // Empty array = no location filtering
+  preferredStates             String  @default("[]") @map("preferred_states")
+  
+  // Whether to include neighboring states in location search
+  // e.g., if California is preferred, also check Nevada, Oregon, Arizona
+  includeNeighborStates       Boolean @default(true) @map("include_neighbor_states")
+  
+  // Notification Preferences
+  // When to send email alerts:
+  
+  // Send email when status changes to "available"
+  notifyOnAvailable           Boolean @default(true) @map("notify_on_available")
+  
+  // Send email when an earlier slot becomes available
+  notifyOnSlotChange          Boolean @default(true) @map("notify_on_slot_change")
+  
+  // Send email when page requires user interaction (form selection)
+  notifyOnRequiresInteraction Boolean @default(false) @map("notify_on_requires_interaction")
+  
+  // Requirements Enrichment (Reducto)
+  // Whether to extract "what to bring" lists from PDF/HTML
+  // Setting to false disables Reducto API calls entirely
+  includeRequirements         Boolean @default(true) @map("include_requirements")
+  
+  // Rate Limiting
+  // Maximum number of alert emails per day (0 = unlimited)
+  maxEmailsPerDay             Int     @default(10) @map("max_emails_per_day")
+  
+  // Timestamps
+  createdAt                   DateTime @default(now()) @map("created_at")
+  updatedAt                   DateTime @updatedAt @map("updated_at")
+
+  @@map("user_settings")
+}

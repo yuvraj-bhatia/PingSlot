@@ -4,6 +4,7 @@
  */
 
 import { z } from "zod";
+import type { TargetSummary, TargetDetail, CheckRunResponse, CreateTargetInput } from "./apiTypes";
 
 // ============================================================================
 // Error Types
@@ -84,7 +85,7 @@ async function fetchWithTimeout(
 }
 
 // ============================================================================
-// API Client
+// API Request Handler
 // ============================================================================
 
 async function request<T>(
@@ -122,7 +123,7 @@ async function request<T>(
       }
 
       throw new ApiError(
-        errorData.message || `Request failed with status ${response.status}`,
+        errorData.message || errorData.error || `Request failed with status ${response.status}`,
         response.status,
         errorData.code,
         errorData.details
@@ -188,3 +189,41 @@ export async function validatedRequest<T, S extends z.ZodType>(
 
   return result.data as T;
 }
+
+// ============================================================================
+// Typed API Methods
+// ============================================================================
+
+export const api = {
+  // Targets
+  targets: {
+    list: () => apiClient.get<{ targets: TargetSummary[] }>("/targets"),
+    get: (id: string) => apiClient.get<{ target: TargetDetail }>(`/targets/${id}`),
+    create: (data: CreateTargetInput) => apiClient.post<{ target: TargetSummary }>("/targets", data),
+    update: (id: string, data: Partial<CreateTargetInput>) => 
+      apiClient.patch<{ target: TargetSummary }>(`/targets/${id}`, data),
+    delete: (id: string) => apiClient.delete<{ success: boolean }>(`/targets/${id}`),
+    toggleActive: (id: string, active: boolean) => 
+      apiClient.patch<{ target: TargetSummary }>(`/targets/${id}`, { active }),
+  },
+
+  // Check runs
+  check: {
+    run: (targetIds?: string[]) => 
+      apiClient.post<CheckRunResponse>("/check", targetIds ? { targetIds } : {}),
+    runSingle: (targetId: string) => 
+      apiClient.post<CheckRunResponse>(`/check/${targetId}`),
+  },
+
+  // Results
+  results: {
+    get: (targetId: string) => 
+      apiClient.get<{
+        target: { id: string; name: string; type: string; status: string };
+        latest: unknown;
+        history: unknown[];
+      }>(`/results?targetId=${targetId}`),
+  },
+};
+
+export default apiClient;

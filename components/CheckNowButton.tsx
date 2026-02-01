@@ -11,7 +11,7 @@ interface CheckNowButtonProps {
 }
 
 /**
- * Primary action button to start a check run.
+ * Primary action button to start a check run with gradient styling.
  */
 export function CheckNowButton({
   onClick,
@@ -25,6 +25,7 @@ export function CheckNowButton({
         isLoading={isLoading}
         disabled={disabled || isLoading}
         variant="primary"
+        className="min-w-[140px]"
       >
         {isLoading ? (
           <>

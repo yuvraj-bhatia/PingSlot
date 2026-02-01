@@ -6,257 +6,197 @@ import type {
 } from "./apiTypes";
 
 // ============================================================================
-// Fixture Data
+// Fixture Data - Aligned with mock data shapes from requirements
 // ============================================================================
 
 export const mockTargets: TargetSummary[] = [
   {
     id: "target-1",
-    name: "City Hall - Midtown",
-    type: "acuity",
-    bookingUrl: "https://cityhall.acuityscheduling.com",
+    name: "Downtown DMV",
+    bookingUrl: "https://dmv.example.gov/booking",
     status: "available",
-    nextSlotTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-    lastCheckedAt: new Date().toISOString(),
-    lastEmailSent: {
-      sent: true,
-      reason: "Slot available within 48 hours",
-    },
-    active: true,
+    nextSlotTime: new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
+    lastCheckedAt: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
+    lastAlertStatus: "sent",
   },
   {
     id: "target-2",
-    name: "DMV - Westlake",
-    type: "generic",
-    bookingUrl: "https://dmv.example.gov/westlake",
+    name: "City Passport Office",
+    bookingUrl: "https://passport.example.gov/appointments",
     status: "unavailable",
     nextSlotTime: null,
-    lastCheckedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5 mins ago
-    lastEmailSent: {
-      sent: false,
-      reason: "No slots available",
-    },
-    active: true,
+    lastCheckedAt: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
+    lastAlertStatus: "skipped: no availability",
   },
   {
     id: "target-3",
-    name: "County Office",
-    type: "unknown",
-    bookingUrl: null,
+    name: "County Clerk - Marriage License",
+    bookingUrl: "https://clerk.example.gov/marriage",
     status: "unknown",
     nextSlotTime: null,
-    lastCheckedAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // 1 hour ago
-    lastEmailSent: null,
-    active: false,
+    lastCheckedAt: null,
+    lastAlertStatus: null,
   },
   {
     id: "target-4",
-    name: "Passport Center - Downtown",
-    type: "generic",
-    bookingUrl: "https://passport.example.gov/book",
-    status: "available",
-    nextSlotTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days
-    lastCheckedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 mins ago
-    lastEmailSent: {
-      sent: true,
-      reason: "New slot opened",
-    },
-    active: true,
+    name: "Regional Tax Office",
+    bookingUrl: "https://tax.example.gov/book",
+    status: "error",
+    nextSlotTime: null,
+    lastCheckedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+    lastAlertStatus: "failed: site unreachable",
   },
 ];
 
 export const mockTargetDetails: Record<string, TargetDetail> = {
   "target-1": {
     id: "target-1",
-    name: "City Hall - Midtown",
-    type: "acuity",
-    bookingUrl: "https://cityhall.acuityscheduling.com",
-    requirementsUrl: "https://cityhall.gov/requirements",
+    name: "Downtown DMV",
+    bookingUrl: "https://dmv.example.gov/booking",
+    requirementsUrl: "https://dmv.example.gov/requirements",
     alertEmail: "alerts@example.com",
-    active: true,
     status: "available",
-    nextSlotTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    lastCheckedAt: new Date().toISOString(),
+    nextSlotTime: new Date(Date.now() + 86400000 * 2).toISOString(),
+    lastCheckedAt: new Date(Date.now() - 300000).toISOString(),
     requirementsBullets: [
-      "Bring state-issued ID",
-      "Arrive 15 minutes early",
-      "Print confirmation page",
+      "Valid driver's license or ID card",
+      "Proof of residency (utility bill, lease agreement)",
+      "Social Security Number",
+      "Payment method (card or check)",
     ],
+    lastAlert: {
+      status: "sent",
+      reason: "Slot became available",
+      at: new Date(Date.now() - 300000).toISOString(),
+    },
     lastCheck: {
       status: "available",
-      nextSlotTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      bookingLink: "https://cityhall.acuityscheduling.com/schedule.php?appointment=12345",
-      email: {
-        sent: true,
-        reason: "Slot available within 48 hours",
-      },
-      requirementsCount: 3,
-      checkedAt: new Date().toISOString(),
+      nextSlotTime: new Date(Date.now() + 86400000 * 2).toISOString(),
+      bookingLink: "https://dmv.example.gov/booking",
+      email: { sent: true, reason: "Alert sent" },
+      requirementsCount: 4,
+      checkedAt: new Date(Date.now() - 300000).toISOString(),
     },
     recentChecks: [
       {
-        checkedAt: new Date().toISOString(),
+        checkedAt: new Date(Date.now() - 300000).toISOString(),
         status: "available",
-        nextSlotTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        emailSent: true,
-        rawDebug: null,
+        nextSlotTime: new Date(Date.now() + 86400000 * 2).toISOString(),
+        rawDebug: "Found 3 slots. Next: 2026-02-02T10:00:00Z",
       },
       {
-        checkedAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+        checkedAt: new Date(Date.now() - 3300000).toISOString(),
         status: "unavailable",
         nextSlotTime: null,
-        emailSent: false,
-        rawDebug: null,
+        rawDebug: "No slots found in 90-day window",
       },
       {
-        checkedAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+        checkedAt: new Date(Date.now() - 6900000).toISOString(),
         status: "unavailable",
         nextSlotTime: null,
-        emailSent: false,
-        rawDebug: null,
-      },
-      {
-        checkedAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
-        status: "available",
-        nextSlotTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-        emailSent: true,
-        rawDebug: null,
-      },
-      {
-        checkedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        status: "unavailable",
-        nextSlotTime: null,
-        emailSent: false,
-        rawDebug: null,
+        rawDebug: "No slots found in 90-day window",
       },
     ],
   },
   "target-2": {
     id: "target-2",
-    name: "DMV - Westlake",
-    type: "generic",
-    bookingUrl: "https://dmv.example.gov/westlake",
-    requirementsUrl: "https://dmv.example.gov/requirements",
-    alertEmail: "dmv-alerts@example.com",
-    active: true,
+    name: "City Passport Office",
+    bookingUrl: "https://passport.example.gov/appointments",
+    requirementsUrl: "https://passport.example.gov/what-to-bring",
+    alertEmail: "alerts@example.com",
     status: "unavailable",
     nextSlotTime: null,
-    lastCheckedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    lastCheckedAt: new Date(Date.now() - 600000).toISOString(),
     requirementsBullets: [
-      "Proof of residence",
-      "Payment card",
-      "Completed application form",
+      "Completed DS-11 form",
+      "Proof of US citizenship (birth certificate, naturalization certificate)",
+      "Government-issued photo ID",
+      "Passport photo (2x2 inches)",
+      "Payment for fees",
     ],
+    lastAlert: {
+      status: "skipped",
+      reason: "No availability detected",
+      at: new Date(Date.now() - 600000).toISOString(),
+    },
     lastCheck: {
       status: "unavailable",
       nextSlotTime: null,
-      bookingLink: null,
-      email: {
-        sent: false,
-        reason: "No slots available",
-      },
-      requirementsCount: 3,
-      checkedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+      bookingLink: "https://passport.example.gov/appointments",
+      email: { sent: false, reason: "No availability" },
+      requirementsCount: 5,
+      checkedAt: new Date(Date.now() - 600000).toISOString(),
     },
     recentChecks: [
       {
-        checkedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+        checkedAt: new Date(Date.now() - 600000).toISOString(),
         status: "unavailable",
         nextSlotTime: null,
-        emailSent: false,
-        rawDebug: null,
+        rawDebug: "Calendar shows 'No appointments available'",
       },
       {
-        checkedAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
+        checkedAt: new Date(Date.now() - 4200000).toISOString(),
         status: "unavailable",
         nextSlotTime: null,
-        emailSent: false,
-        rawDebug: null,
-      },
-      {
-        checkedAt: new Date(Date.now() - 65 * 60 * 1000).toISOString(),
-        status: "error",
-        nextSlotTime: null,
-        emailSent: false,
-        rawDebug: "Connection timeout after 30s",
+        rawDebug: "Calendar shows 'No appointments available'",
       },
     ],
   },
   "target-3": {
     id: "target-3",
-    name: "County Office",
-    type: "unknown",
-    bookingUrl: null,
+    name: "County Clerk - Marriage License",
+    bookingUrl: "https://clerk.example.gov/marriage",
     requirementsUrl: null,
-    alertEmail: "admin@example.com",
-    active: false,
+    alertEmail: "alerts@example.com",
     status: "unknown",
     nextSlotTime: null,
-    lastCheckedAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+    lastCheckedAt: null,
     requirementsBullets: null,
-    lastCheck: {
-      status: "unknown",
-      nextSlotTime: null,
-      bookingLink: null,
-      email: {
-        sent: false,
-        reason: "Target inactive",
-      },
-      requirementsCount: 0,
-      checkedAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-    },
-    recentChecks: [
-      {
-        checkedAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-        status: "unknown",
-        nextSlotTime: null,
-        emailSent: false,
-        rawDebug: "Timeout from upstream system",
-      },
-    ],
+    lastAlert: null,
+    lastCheck: null,
+    recentChecks: [],
   },
   "target-4": {
     id: "target-4",
-    name: "Passport Center - Downtown",
-    type: "generic",
-    bookingUrl: "https://passport.example.gov/book",
-    requirementsUrl: "https://passport.example.gov/requirements",
-    alertEmail: "travel@example.com",
-    active: true,
-    status: "available",
-    nextSlotTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-    lastCheckedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-    requirementsBullets: [
-      "Valid photo ID",
-      "Passport photo (2x2 inches)",
-      "Application fee",
-      "Birth certificate",
-    ],
+    name: "Regional Tax Office",
+    bookingUrl: "https://tax.example.gov/book",
+    requirementsUrl: null,
+    alertEmail: "alerts@example.com",
+    status: "error",
+    nextSlotTime: null,
+    lastCheckedAt: new Date(Date.now() - 3600000).toISOString(),
+    requirementsBullets: null,
+    lastAlert: {
+      status: "failed",
+      reason: "Site unreachable (timeout)",
+      at: new Date(Date.now() - 3600000).toISOString(),
+    },
     lastCheck: {
-      status: "available",
-      nextSlotTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-      bookingLink: "https://passport.example.gov/book/confirm?slot=456",
-      email: {
-        sent: true,
-        reason: "New slot opened",
-      },
-      requirementsCount: 4,
-      checkedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+      status: "error",
+      nextSlotTime: null,
+      bookingLink: "https://tax.example.gov/book",
+      email: { sent: false, reason: "Check failed" },
+      requirementsCount: 0,
+      checkedAt: new Date(Date.now() - 3600000).toISOString(),
     },
     recentChecks: [
       {
-        checkedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-        status: "available",
-        nextSlotTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-        emailSent: true,
-        rawDebug: null,
+        checkedAt: new Date(Date.now() - 3600000).toISOString(),
+        status: "error",
+        nextSlotTime: null,
+        rawDebug: "Error: ETIMEDOUT at fetch booking page",
       },
       {
-        checkedAt: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+        checkedAt: new Date(Date.now() - 7200000).toISOString(),
+        status: "error",
+        nextSlotTime: null,
+        rawDebug: "Error: ETIMEDOUT at fetch booking page",
+      },
+      {
+        checkedAt: new Date(Date.now() - 10800000).toISOString(),
         status: "unavailable",
         nextSlotTime: null,
-        emailSent: false,
-        rawDebug: null,
+        rawDebug: "No slots available",
       },
     ],
   },
@@ -272,7 +212,7 @@ export function startMockCheckRun(targetIds?: string[]): string {
   const runId = `run-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   const targets = targetIds
     ? mockTargets.filter((t) => targetIds.includes(t.id))
-    : mockTargets.filter((t) => t.active);
+    : mockTargets;
 
   // Create pending run
   const run: CheckRunResponse = {
@@ -299,7 +239,10 @@ export function startMockCheckRun(targetIds?: string[]): string {
       status: target.status,
       nextSlotTime: target.nextSlotTime,
       bookingLink: target.bookingUrl,
-      email: target.lastEmailSent || { sent: false, reason: "N/A" },
+      email: { 
+        sent: target.lastAlertStatus === "sent", 
+        reason: target.lastAlertStatus || "N/A" 
+      },
       requirementsCount: mockTargetDetails[target.id]?.requirementsBullets?.length || 0,
     }));
 
@@ -338,21 +281,25 @@ export function createMockTarget(input: {
   const target: TargetSummary = {
     id,
     name: input.name,
-    type: input.type,
     bookingUrl: input.bookingUrl,
     status: "unknown",
     nextSlotTime: null,
     lastCheckedAt: null,
-    lastEmailSent: null,
-    active: input.active,
+    lastAlertStatus: null,
   };
 
   mockTargets.push(target);
   mockTargetDetails[id] = {
-    ...target,
+    id,
+    name: input.name,
+    bookingUrl: input.bookingUrl,
     requirementsUrl: input.requirementsUrl || null,
     alertEmail: input.alertEmail,
+    status: "unknown",
+    nextSlotTime: null,
+    lastCheckedAt: null,
     requirementsBullets: null,
+    lastAlert: null,
     lastCheck: null,
     recentChecks: [],
   };
@@ -360,15 +307,17 @@ export function createMockTarget(input: {
   return target;
 }
 
+// ============================================================================
+// Toggle Target Active
+// ============================================================================
+
 export function toggleMockTargetActive(id: string, active: boolean): TargetSummary | null {
   const target = mockTargets.find((t) => t.id === id);
   const detail = mockTargetDetails[id];
 
   if (!target || !detail) return null;
 
-  target.active = active;
-  detail.active = active;
-
+  // Note: active field doesn't exist in new types, this is for API compatibility
   return target;
 }
 
@@ -382,26 +331,42 @@ export function simulateAvailability(targetId: string, available: boolean): void
 
   if (!target || !detail) return;
 
-  if (available) {
-    const nextSlot = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-    target.status = "available";
-    target.nextSlotTime = nextSlot;
-    detail.status = "available";
-    detail.nextSlotTime = nextSlot;
-    if (detail.lastCheck) {
-      detail.lastCheck.status = "available";
-      detail.lastCheck.nextSlotTime = nextSlot;
-      detail.lastCheck.email = { sent: true, reason: "Simulated availability" };
-    }
-  } else {
-    target.status = "unavailable";
-    target.nextSlotTime = null;
-    detail.status = "unavailable";
-    detail.nextSlotTime = null;
-    if (detail.lastCheck) {
-      detail.lastCheck.status = "unavailable";
-      detail.lastCheck.nextSlotTime = null;
-      detail.lastCheck.email = { sent: false, reason: "Simulated unavailability" };
-    }
-  }
+  const nextSlot = available
+    ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    : null;
+
+  target.status = available ? "available" : "unavailable";
+  target.nextSlotTime = nextSlot;
+  target.lastCheckedAt = new Date().toISOString();
+  target.lastAlertStatus = available ? "sent" : "skipped: no availability";
+
+  detail.status = available ? "available" : "unavailable";
+  detail.nextSlotTime = nextSlot;
+  detail.lastCheckedAt = new Date().toISOString();
+  detail.lastAlert = available
+    ? {
+        status: "sent",
+        reason: "Slot became available",
+        at: new Date().toISOString(),
+      }
+    : {
+        status: "skipped",
+        reason: "No availability detected",
+        at: new Date().toISOString(),
+      };
+  detail.lastCheck = {
+    status: available ? "available" : "unavailable",
+    nextSlotTime: nextSlot,
+    bookingLink: target.bookingUrl,
+    email: { sent: available, reason: available ? "Alert sent" : "No availability" },
+    requirementsCount: detail.requirementsBullets?.length || 0,
+    checkedAt: new Date().toISOString(),
+  };
+  
+  detail.recentChecks.unshift({
+    checkedAt: new Date().toISOString(),
+    status: available ? "available" : "unavailable",
+    nextSlotTime: nextSlot,
+    rawDebug: available ? "Found available slots" : "No slots available",
+  });
 }

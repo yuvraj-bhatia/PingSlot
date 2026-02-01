@@ -1,64 +1,131 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mockTargetDetails, toggleMockTargetActive } from "../../../../lib/fixtures";
+import { getTargetDetail, updateTarget, deleteTarget, toggleTargetActive } from "../../../../lib/backend";
 
 interface RouteParams {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /**
- * GET /api/targets/:id
- * Get detailed information for a specific target.
+ * GET /api/targets/[id]
+ * Get detailed information about a specific target.
+ * 
+ * Response:
+ * { target: TargetDetail }
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { id } = params;
+  const { id } = await params;
 
-  // Simulate network latency
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  try {
+    const target = await getTargetDetail(id);
 
-  const target = mockTargetDetails[id];
+    if (!target) {
+      return NextResponse.json(
+        { error: "Target not found" },
+        { status: 404 }
+      );
+    }
 
-  if (!target) {
+    return NextResponse.json({ target });
+  } catch (error) {
+    console.error("[API] Failed to get target:", error);
     return NextResponse.json(
-      { error: "Target not found" },
-      { status: 404 }
+      { 
+        error: "Failed to get target",
+        message: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({ target });
 }
 
 /**
- * PATCH /api/targets/:id
- * Update a target (e.g., toggle active state).
+ * PATCH /api/targets/[id]
+ * Update a target's configuration.
+ * 
+ * Request body (all fields optional):
+ * {
+ *   name?: string;
+ *   bookingUrl?: string;
+ *   type?: "acuity" | "generic" | "unknown";
+ *   requirementsUrl?: string | null;
+ *   alertEmail?: string;
+ *   active?: boolean;
+ * }
+ * 
+ * Response:
+ * { target: TargetSummary }
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const body = await request.json();
 
-    // Simulate network latency
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    // Handle active toggle
-    if (typeof body.active === "boolean") {
-      const target = toggleMockTargetActive(id, body.active);
+    // Handle special case: toggle active status
+    if (Object.keys(body).length === 1 && typeof body.active === "boolean") {
+      const target = await toggleTargetActive(id, body.active);
+      
       if (!target) {
         return NextResponse.json(
           { error: "Target not found" },
           { status: 404 }
         );
       }
+
       return NextResponse.json({ target });
     }
 
-    return NextResponse.json(
-      { error: "No valid update fields provided" },
-      { status: 400 }
-    );
+    // General update
+    const target = await updateTarget(id, body);
+
+    if (!target) {
+      return NextResponse.json(
+        { error: "Target not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ target });
   } catch (error) {
+    console.error("[API] Failed to update target:", error);
     return NextResponse.json(
-      { error: "Failed to update target" },
+      { 
+        error: "Failed to update target",
+        message: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * DELETE /api/targets/[id]
+ * Delete a target and all its associated data.
+ * 
+ * Response:
+ * { success: true }
+ */
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  const { id } = await params;
+
+  try {
+    const deleted = await deleteTarget(id);
+
+    if (!deleted) {
+      return NextResponse.json(
+        { error: "Target not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("[API] Failed to delete target:", error);
+    return NextResponse.json(
+      { 
+        error: "Failed to delete target",
+        message: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }

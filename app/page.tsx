@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { PageShell, PageHeader } from "../components/PageShell";
+import { Activity, Target, Clock, Bell, Zap, TrendingUp } from "lucide-react";
+import { PageShell, PageHeader, DashboardGrid, SectionHeading } from "../components/PageShell";
 import { TargetsList } from "../components/TargetsList";
 import { AddTargetDrawer } from "../components/AddTargetDrawer";
 import { CheckNowButton } from "../components/CheckNowButton";
 import { RunSummary } from "../components/RunSummary";
+import { KPICard, Card, CardContent } from "../components/ui/Card";
 import { useTargets, useStartCheckRun, useCheckRun } from "../lib/hooks";
 import { useToastHelpers } from "../components/ToastProvider";
 
@@ -86,17 +88,28 @@ export default function DashboardPage() {
     }
   }, [targetsError, showError]);
 
+  // Compute stats
+  const stats = {
+    totalTargets: targets?.length ?? 0,
+    activeTargets: targets?.filter(t => t.status === "available").length ?? 0,
+    unavailable: targets?.filter(t => t.status === "unavailable").length ?? 0,
+    lastChecked: targets?.[0]?.lastCheckedAt ?? null,
+  };
+
   return (
     <div className="min-h-[calc(100vh-8rem)]">
       <PageHeader>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 border border-[rgba(255,128,0,0.35)] bg-[rgba(255,128,0,0.1)]" style={{ boxShadow: "0 0 25px rgba(255, 128, 0, 0.15)" }}>
+              <Activity className="h-4 w-4 text-[#FF8000]" />
+              <span className="text-sm font-bold text-[#FF8000]">Dashboard</span>
+            </div>
             <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Dashboard
+              Appointment Monitor
             </h1>
-            <p className="text-base text-foreground-muted sm:text-lg">
-              Track appointment availability, run checks, and review alert
-              activity.
+            <p className="max-w-xl text-base text-foreground-muted sm:text-lg">
+              Track appointment availability across all your targets. Get instant alerts when slots open up.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -110,31 +123,63 @@ export default function DashboardPage() {
         </div>
       </PageHeader>
 
-      <PageShell className="space-y-8 pb-12">
-        {/* Run Summary */}
-        <RunSummary
-          run={checkRun || null}
-          isLoading={startCheckRun.isPending || checkRunLoading}
-          error={checkRunError}
-        />
+      <PageShell className="space-y-10 pb-16">
+        {/* KPI Cards */}
+        <section>
+          <DashboardGrid columns={4}>
+            <KPICard
+              icon={<Target className="h-5 w-5" />}
+              title="Total Targets"
+              value={stats.totalTargets}
+              subtext={stats.totalTargets > 0 ? "Being monitored" : "Add a target to start"}
+            />
+            <KPICard
+              icon={<TrendingUp className="h-5 w-5" />}
+              title="Available"
+              value={stats.activeTargets}
+              subtext={stats.activeTargets > 0 ? "Slots open now" : "No open slots"}
+              trend={stats.activeTargets > 0 ? "up" : "neutral"}
+            />
+            <KPICard
+              icon={<Clock className="h-5 w-5" />}
+              title="Unavailable"
+              value={stats.unavailable}
+              subtext="No slots available"
+            />
+            <KPICard
+              icon={<Bell className="h-5 w-5" />}
+              title="Last Check"
+              value={stats.lastChecked ? formatTimeAgo(stats.lastChecked) : "—"}
+              subtext={stats.lastChecked ? "Automatic check" : "Never checked"}
+            />
+          </DashboardGrid>
+        </section>
+
+        {/* Run Summary - Only show when active */}
+        {(checkRun || startCheckRun.isPending || checkRunLoading) && (
+          <section>
+            <RunSummary
+              run={checkRun || null}
+              isLoading={startCheckRun.isPending || checkRunLoading}
+              error={checkRunError}
+            />
+          </section>
+        )}
 
         {/* Targets List */}
-        <section className="space-y-5">
-          <div className="flex items-center justify-between border-b border-border/50 pb-3">
-            <h2 className="font-display text-xl font-semibold text-foreground sm:text-2xl">
-              Targets
-            </h2>
-            {targets && (
-              <span className="text-sm font-medium text-foreground-muted">
-                {targets.length} target{targets.length !== 1 ? "s" : ""}
-                {targets.filter((t) => t.active).length > 0 && (
-                  <span className="ml-2 text-accent">
-                    • {targets.filter((t) => t.active).length} active
-                  </span>
-                )}
-              </span>
-            )}
-          </div>
+        <section className="space-y-6">
+          <SectionHeading
+            title="Monitoring Targets"
+            description="All endpoints being monitored for availability"
+            action={
+              targets && targets.length > 0 && (
+                <span className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium border border-[rgba(0,87,184,0.3)] bg-[rgba(0,87,184,0.1)]" style={{ color: "#0066CC" }}>
+                  <Zap className="h-4 w-4" />
+                  {targets.length} target{targets.length !== 1 ? "s" : ""}
+                </span>
+              )
+            }
+          />
           <TargetsList
             targets={targets || []}
             isLoading={targetsLoading}
@@ -142,7 +187,47 @@ export default function DashboardPage() {
             highlightedIds={highlightedTargetIds}
           />
         </section>
+
+        {/* Quick Tips Card - Show when no targets */}
+        {!targetsLoading && (!targets || targets.length === 0) && (
+          <Card variant="glass" className="p-8">
+            <CardContent className="text-center space-y-4">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgba(255,128,0,0.1)] border border-[rgba(255,128,0,0.3)]" style={{ boxShadow: "0 0 35px rgba(255, 128, 0, 0.2)" }}>
+                <Target className="h-8 w-8 text-[#FF8000]" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-[#F8F4F0]">
+                  Get Started with PingSlot
+                </h3>
+                <p className="max-w-md mx-auto text-[#888888]">
+                  Add your first monitoring target to start tracking appointment availability. 
+                  You&apos;ll receive alerts as soon as slots become available.
+                </p>
+              </div>
+              <div className="flex justify-center gap-4 pt-2">
+                <AddTargetDrawer onSuccess={() => refetchTargets()} />
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </PageShell>
     </div>
   );
+}
+
+// Helper function to format time ago
+function formatTimeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays}d ago`;
 }

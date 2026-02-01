@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { targetDetails } from "../../../lib/mockData";
+import { getTargetDetail } from "../../../lib/backend";
 
-// GET /api/results?targetId=... - latest + last 5
+/**
+ * GET /api/results?targetId=...
+ * Get the latest check result and history for a target.
+ * 
+ * Query params:
+ * - targetId: string (required)
+ * 
+ * Response:
+ * {
+ *   target: { id, name, type, status };
+ *   latest: CheckResult | null;
+ *   history: RecentCheck[];
+ * }
+ */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -14,8 +27,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Replace with real database query
-    const target = targetDetails[targetId];
+    const target = await getTargetDetail(targetId);
+    
     if (!target) {
       return NextResponse.json(
         { error: "Target not found" },
@@ -34,8 +47,12 @@ export async function GET(request: NextRequest) {
       history: target.recentChecks.slice(0, 5),
     });
   } catch (error) {
+    console.error("[API] Failed to fetch results:", error);
     return NextResponse.json(
-      { error: "Failed to fetch results" },
+      { 
+        error: "Failed to fetch results",
+        message: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }

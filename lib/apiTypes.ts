@@ -24,58 +24,96 @@ export const CheckRunStatusSchema = z.enum([
 export type CheckRunStatus = z.infer<typeof CheckRunStatusSchema>;
 
 // ============================================================================
-// Target Schemas
+// Target Schemas - Aligned with mock data shapes from requirements
 // ============================================================================
 
+/**
+ * TargetSummary - Used in dashboard list view
+ * {
+ *   id: string;
+ *   name: string;
+ *   bookingUrl: string | null;
+ *   status: "available" | "unavailable" | "unknown" | "error";
+ *   nextSlotTime: string | null;
+ *   lastCheckedAt: string | null;
+ *   lastAlertStatus: string | null;
+ * }
+ */
 export const TargetSummarySchema = z.object({
   id: z.string(),
   name: z.string(),
-  type: TargetTypeSchema,
+  type: z.string().optional(),
   bookingUrl: z.string().nullable(),
   status: TargetStatusSchema,
-  nextSlotTime: z.string().datetime().nullable(),
-  lastCheckedAt: z.string().datetime().nullable(),
-  lastEmailSent: z
-    .object({
-      sent: z.boolean(),
-      reason: z.string(),
-    })
-    .nullable(),
-  active: z.boolean(),
+  nextSlotTime: z.string().nullable(),
+  lastCheckedAt: z.string().nullable(),
+  lastAlertStatus: z.string().nullable(),
+  active: z.boolean().optional(),
 });
 export type TargetSummary = z.infer<typeof TargetSummarySchema>;
 
+/**
+ * TargetDetail - Used in detail page
+ * {
+ *   id: string;
+ *   name: string;
+ *   bookingUrl: string | null;
+ *   requirementsUrl: string | null;
+ *   status: string;
+ *   nextSlotTime: string | null;
+ *   lastCheckedAt: string | null;
+ *   requirementsBullets: string[] | null;
+ *   lastAlert: {
+ *     status: string;
+ *     reason: string | null;
+ *     at: string | null;
+ *   } | null;
+ *   recentChecks: {
+ *     checkedAt: string;
+ *     status: string;
+ *     nextSlotTime: string | null;
+ *     rawDebug: string | null;
+ *   }[];
+ * }
+ */
 export const TargetDetailSchema = z.object({
   id: z.string(),
   name: z.string(),
-  type: TargetTypeSchema,
   bookingUrl: z.string().nullable(),
   requirementsUrl: z.string().nullable(),
   alertEmail: z.string(),
-  active: z.boolean(),
+  active: z.boolean().optional(),
+  type: z.string().optional(),
   status: TargetStatusSchema,
-  nextSlotTime: z.string().datetime().nullable(),
-  lastCheckedAt: z.string().datetime().nullable(),
+  nextSlotTime: z.string().nullable(),
+  lastCheckedAt: z.string().nullable(),
   requirementsBullets: z.array(z.string()).nullable(),
+  lastAlert: z
+    .object({
+      status: z.string(),
+      reason: z.string().nullable(),
+      at: z.string().nullable(),
+    })
+    .nullable(),
   lastCheck: z
     .object({
-      status: TargetStatusSchema,
-      nextSlotTime: z.string().datetime().nullable(),
+      status: z.string(),
+      nextSlotTime: z.string().nullable(),
       bookingLink: z.string().nullable(),
       email: z.object({
         sent: z.boolean(),
         reason: z.string(),
       }),
       requirementsCount: z.number(),
-      checkedAt: z.string().datetime(),
+      checkedAt: z.string(),
     })
     .nullable(),
   recentChecks: z.array(
     z.object({
-      checkedAt: z.string().datetime(),
+      checkedAt: z.string(),
       status: TargetStatusSchema,
-      nextSlotTime: z.string().datetime().nullable(),
-      emailSent: z.boolean(),
+      nextSlotTime: z.string().nullable(),
+      emailSent: z.boolean().optional(),
       rawDebug: z.string().nullable(),
     })
   ),

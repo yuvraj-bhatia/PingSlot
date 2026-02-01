@@ -1,76 +1,64 @@
 import * as React from "react";
 import { cn } from "../../lib/cn";
 
-const badgeVariants = {
-  default: "bg-muted text-foreground border border-border",
-  primary: "bg-accent/15 text-accent border border-accent/25",
-  secondary: "bg-teal/15 text-teal border border-teal/25",
-  success: "bg-success/15 text-success border border-success/25",
-  warning: "bg-warning/15 text-warning border border-warning/25",
-  error: "bg-error/15 text-error border border-error/25",
-  outline: "bg-transparent text-foreground border border-border",
-  ghost: "bg-transparent text-foreground-muted",
-} as const;
-
-const badgeSizes = {
-  sm: "h-5 px-1.5 text-[10px]",
-  md: "h-6 px-2.5 text-xs",
-  lg: "h-7 px-3 text-sm",
-} as const;
-
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: keyof typeof badgeVariants;
-  size?: keyof typeof badgeSizes;
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: "default" | "success" | "warning" | "error" | "ghost" | "accent" | "teal";
+  size?: "sm" | "md";
 }
 
 /**
- * Badge component for displaying status, labels, or counts.
+ * Modern Badge component with glassmorphism effects.
  */
-export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant = "default", size = "md", ...props }, ref) => {
-    return (
-      <span
-        ref={ref}
-        className={cn(
-          "inline-flex items-center justify-center gap-1 rounded-full font-medium",
-          "transition-colors",
-          badgeVariants[variant],
-          badgeSizes[size],
-          className
-        )}
-        {...props}
-      />
-    );
-  }
-);
-
-Badge.displayName = "Badge";
-
-/**
- * Status dot indicator for use with badges or standalone.
- */
-export function StatusDot({
-  status,
+export function Badge({
   className,
-}: {
-  status: "success" | "warning" | "error" | "info" | "default";
-  className?: string;
-}) {
-  const statusColors = {
-    success: "bg-success",
-    warning: "bg-warning",
-    error: "bg-error",
-    info: "bg-info",
-    default: "bg-foreground-muted",
+  variant = "default",
+  size = "md",
+  ...props
+}: BadgeProps) {
+  const variants = {
+    default: cn(
+      "bg-white/[0.06] text-foreground border-white/[0.1]",
+      "shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+    ),
+    success: cn(
+      "bg-success/15 text-success border-success/25",
+      "shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+    ),
+    warning: cn(
+      "bg-warning/15 text-warning border-warning/25",
+      "shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+    ),
+    error: cn(
+      "bg-error/15 text-error border-error/25",
+      "shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+    ),
+    accent: cn(
+      "bg-accent/15 text-accent border-accent/25",
+      "shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+    ),
+    teal: cn(
+      "bg-teal/15 text-teal border-teal/25",
+      "shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+    ),
+    ghost: "bg-transparent border-transparent",
+  };
+
+  const sizes = {
+    sm: "px-2 py-0.5 text-[10px]",
+    md: "px-2.5 py-1 text-xs",
   };
 
   return (
     <span
       className={cn(
-        "h-1.5 w-1.5 rounded-full",
-        statusColors[status],
+        "inline-flex items-center justify-center",
+        "rounded-full border font-semibold",
+        "backdrop-blur-sm transition-all duration-200",
+        variants[variant],
+        sizes[size],
         className
       )}
+      {...props}
     />
   );
 }

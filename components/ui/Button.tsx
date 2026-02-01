@@ -4,23 +4,60 @@ import { cn } from "../../lib/cn";
 import { Loader2 } from "lucide-react";
 
 const buttonVariants = {
-  primary:
-    "bg-accent text-accent-foreground hover:bg-accent-hover active:bg-accent-pressed shadow-md hover:shadow-glow-accent",
-  secondary:
-    "bg-card border border-border hover:bg-muted hover:border-border-subtle",
-  ghost: "hover:bg-muted text-foreground-muted hover:text-foreground",
-  danger:
-    "bg-error/10 text-error border border-error/20 hover:bg-error/20 hover:border-error/30",
-  success:
-    "bg-success/10 text-success border border-success/20 hover:bg-success/20 hover:border-success/30",
+  // Primary - McLaren Papaya Orange with strong glow
+  primary: cn(
+    "border-2 border-[#FF8000]/30 bg-gradient-to-r from-[#FF8000] to-[#FF9933] text-[#0A0A0A]",
+    "shadow-[0_0_20px_rgba(255,128,0,0.5),0_8px_32px_rgba(255,128,0,0.35)]",
+    "hover:from-[#FF9020] hover:to-[#FFaa44] hover:shadow-[0_0_30px_rgba(255,128,0,0.6),0_12px_40px_rgba(255,128,0,0.4)]",
+    "active:scale-[0.98] active:shadow-[0_0_15px_rgba(255,128,0,0.4)]",
+    "focus-visible:ring-2 focus-visible:ring-[#FF8000] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
+  ),
+  // Secondary - Glass effect with subtle border
+  secondary: cn(
+    "bg-white/[0.06] backdrop-blur-md",
+    "border border-white/20",
+    "text-[#F8F4F0]",
+    "shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]",
+    "hover:bg-white/[0.12] hover:border-white/30",
+    "hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)]",
+    "active:scale-[0.98]"
+  ),
+  // Ghost - Minimal styling
+  ghost: cn(
+    "text-[#888888]",
+    "hover:bg-white/[0.08] hover:text-[#F8F4F0]",
+    "hover:shadow-[0_4px_16px_rgba(0,0,0,0.25)]",
+    "active:scale-[0.98]"
+  ),
+  // Danger - Error/destructive actions
+  danger: cn(
+    "border border-error/40 bg-gradient-to-r from-error to-[#ff6b6b] text-white",
+    "shadow-[0_0_15px_rgba(239,68,68,0.4),0_6px_20px_rgba(239,68,68,0.3)]",
+    "hover:shadow-[0_0_25px_rgba(239,68,68,0.5),0_8px_28px_rgba(239,68,68,0.4)]",
+    "active:scale-[0.98]"
+  ),
+  // Success - Positive actions
+  success: cn(
+    "border border-success/40 bg-gradient-to-r from-success to-[#4ade80] text-white",
+    "shadow-[0_0_15px_rgba(34,197,94,0.4),0_6px_20px_rgba(34,197,94,0.3)]",
+    "hover:shadow-[0_0_25px_rgba(34,197,94,0.5),0_8px_28px_rgba(34,197,94,0.4)]",
+    "active:scale-[0.98]"
+  ),
+  // Teal/Blue - Secondary accent (for info actions)
+  teal: cn(
+    "border border-[#0077FF]/40 bg-gradient-to-r from-[#0057B8] to-[#0088FF] text-white",
+    "shadow-[0_0_15px_rgba(0,119,255,0.4),0_6px_20px_rgba(0,87,184,0.3)]",
+    "hover:shadow-[0_0_25px_rgba(0,119,255,0.5),0_8px_28px_rgba(0,87,184,0.4)]",
+    "active:scale-[0.98]"
+  ),
 } as const;
 
 const buttonSizes = {
-  sm: "h-8 px-3 text-xs",
-  md: "h-10 px-4 text-sm",
-  lg: "h-12 px-6 text-base",
-  icon: "h-10 w-10",
-  "icon-sm": "h-8 w-8",
+  sm: "h-9 px-4 text-xs",
+  md: "h-11 px-5 text-sm",
+  lg: "h-13 px-7 text-base",
+  icon: "h-11 w-11",
+  "icon-sm": "h-9 w-9",
 } as const;
 
 export interface ButtonProps
@@ -32,7 +69,7 @@ export interface ButtonProps
 }
 
 /**
- * Accessible button component with multiple variants and sizes.
+ * Accessible button component with modern gradient effects and glass styling.
  * Supports loading state and polymorphic rendering via asChild.
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -51,8 +88,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const Comp = asChild ? Slot : "button";
 
-    // When using asChild, we can't add extra elements (like loader) as siblings
-    // The consumer is responsible for handling loading state when asChild is true
     const content = asChild ? (
       children
     ) : (
@@ -68,10 +103,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || isLoading}
         className={cn(
           // Base styles
-          "inline-flex items-center justify-center gap-2 rounded-lg font-semibold",
+          "inline-flex items-center justify-center gap-2",
+          "rounded-xl font-semibold",
           "transition-all duration-200 ease-out",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-          "disabled:pointer-events-none disabled:opacity-50",
+          "focus-visible:outline-none",
+          // Disabled state - more visible but clearly inactive
+          "disabled:pointer-events-none disabled:opacity-40 disabled:saturate-50 disabled:shadow-none",
           // Variant styles
           buttonVariants[variant],
           // Size styles
@@ -93,10 +130,11 @@ export function buttonStyles(
   size: keyof typeof buttonSizes = "md"
 ) {
   return cn(
-    "inline-flex items-center justify-center gap-2 rounded-lg font-semibold",
+    "inline-flex items-center justify-center gap-2",
+    "rounded-xl font-semibold",
     "transition-all duration-200 ease-out",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-    "disabled:pointer-events-none disabled:opacity-50",
+    "focus-visible:outline-none",
+    "disabled:pointer-events-none disabled:opacity-40 disabled:saturate-50 disabled:shadow-none",
     buttonVariants[variant],
     buttonSizes[size]
   );

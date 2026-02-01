@@ -45,3 +45,11 @@ next-env.d.ts
 # prisma
 prisma/migrations/*.sql
 !prisma/migrations/migration_lock.toml
+
+/lib/generated/prisma
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info

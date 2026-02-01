@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp, Globe, Mail, Settings2 } from "lucide-react";
 import { cn } from "../lib/cn";
 import { Button } from "./ui/Button";
 import {
@@ -28,7 +28,7 @@ interface AddTargetDrawerProps {
 }
 
 /**
- * Add Target drawer with form validation (RHF + Zod).
+ * Add Target drawer with modern glassmorphism form styling.
  * Includes advanced section for type and requirements URL.
  */
 export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
@@ -71,27 +71,28 @@ export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button>
+        <Button variant="secondary">
           <Plus className="h-4 w-4" />
           Add target
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="bg-[hsl(222,47%,9%)]">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DrawerHeader>
-            <DrawerTitle>Add a target</DrawerTitle>
+          <DrawerHeader className="border-b border-white/[0.08]">
+            <DrawerTitle className="text-xl">Add a new target</DrawerTitle>
             <DrawerDescription>
-              Configure a new booking target to monitor for availability.
+              Configure a booking target to monitor for availability.
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="flex-1 space-y-6 overflow-y-auto p-6">
             {/* Name */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label
                 htmlFor="name"
-                className="text-sm font-medium text-foreground"
+                className="flex items-center gap-2 text-sm font-semibold text-foreground"
               >
+                <Settings2 className="h-4 w-4 text-accent" />
                 Target name <span className="text-error">*</span>
               </label>
               <input
@@ -99,25 +100,31 @@ export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
                 type="text"
                 placeholder="e.g., Downtown DMV"
                 className={cn(
-                  "w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted/50",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  errors.name && "border-error"
+                  "w-full rounded-xl px-4 py-3 text-sm text-foreground",
+                  "bg-white/[0.04] backdrop-blur-sm",
+                  "border border-white/[0.1]",
+                  "placeholder:text-foreground-muted/40",
+                  "focus:bg-white/[0.06] focus:border-accent/50",
+                  "focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]",
+                  "focus:outline-none transition-all duration-200",
+                  errors.name && "border-error/50 focus:border-error"
                 )}
                 {...register("name")}
               />
               {errors.name && (
-                <p className="text-xs text-error" role="alert">
+                <p className="text-xs text-error font-medium" role="alert">
                   {errors.name.message}
                 </p>
               )}
             </div>
 
             {/* Booking URL */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label
                 htmlFor="bookingUrl"
-                className="text-sm font-medium text-foreground"
+                className="flex items-center gap-2 text-sm font-semibold text-foreground"
               >
+                <Globe className="h-4 w-4 text-teal" />
                 Booking URL <span className="text-error">*</span>
               </label>
               <input
@@ -125,28 +132,34 @@ export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
                 type="url"
                 placeholder="https://example.gov/booking"
                 className={cn(
-                  "w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted/50",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  errors.bookingUrl && "border-error"
+                  "w-full rounded-xl px-4 py-3 text-sm text-foreground",
+                  "bg-white/[0.04] backdrop-blur-sm",
+                  "border border-white/[0.1]",
+                  "placeholder:text-foreground-muted/40",
+                  "focus:bg-white/[0.06] focus:border-accent/50",
+                  "focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]",
+                  "focus:outline-none transition-all duration-200",
+                  errors.bookingUrl && "border-error/50 focus:border-error"
                 )}
                 {...register("bookingUrl")}
               />
               {errors.bookingUrl && (
-                <p className="text-xs text-error" role="alert">
+                <p className="text-xs text-error font-medium" role="alert">
                   {errors.bookingUrl.message}
                 </p>
               )}
               <p className="text-xs text-foreground-muted">
-                Must be a valid HTTPS URL.
+                Must be a valid HTTPS URL for the booking page.
               </p>
             </div>
 
             {/* Alert Email */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label
                 htmlFor="alertEmail"
-                className="text-sm font-medium text-foreground"
+                className="flex items-center gap-2 text-sm font-semibold text-foreground"
               >
+                <Mail className="h-4 w-4 text-accent" />
                 Alert email <span className="text-error">*</span>
               </label>
               <input
@@ -154,27 +167,35 @@ export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
                 type="email"
                 placeholder="alerts@example.com"
                 className={cn(
-                  "w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted/50",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  errors.alertEmail && "border-error"
+                  "w-full rounded-xl px-4 py-3 text-sm text-foreground",
+                  "bg-white/[0.04] backdrop-blur-sm",
+                  "border border-white/[0.1]",
+                  "placeholder:text-foreground-muted/40",
+                  "focus:bg-white/[0.06] focus:border-accent/50",
+                  "focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]",
+                  "focus:outline-none transition-all duration-200",
+                  errors.alertEmail && "border-error/50 focus:border-error"
                 )}
                 {...register("alertEmail")}
               />
               {errors.alertEmail && (
-                <p className="text-xs text-error" role="alert">
+                <p className="text-xs text-error font-medium" role="alert">
                   {errors.alertEmail.message}
                 </p>
               )}
             </div>
 
             {/* Advanced Section */}
-            <div className="border-t border-border pt-4">
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden">
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="flex w-full items-center justify-between text-sm font-medium text-foreground-muted transition-colors hover:text-foreground"
+                className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-foreground-muted transition-colors hover:text-foreground hover:bg-white/[0.03]"
               >
-                Advanced options
+                <span className="flex items-center gap-2">
+                  <Settings2 className="h-4 w-4" />
+                  Advanced options
+                </span>
                 {showAdvanced ? (
                   <ChevronUp className="h-4 w-4" />
                 ) : (
@@ -183,21 +204,25 @@ export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
               </button>
 
               {showAdvanced && (
-                <div className="mt-4 space-y-4">
+                <div className="space-y-5 px-4 pb-4 pt-2 border-t border-white/[0.06]">
                   {/* Type */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label
                       htmlFor="type"
-                      className="text-sm font-medium text-foreground"
+                      className="text-sm font-semibold text-foreground"
                     >
                       Target type
                     </label>
                     <select
                       id="type"
                       className={cn(
-                        "w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        errors.type && "border-error"
+                        "w-full rounded-xl px-4 py-3 text-sm text-foreground",
+                        "bg-white/[0.04] backdrop-blur-sm",
+                        "border border-white/[0.1]",
+                        "focus:bg-white/[0.06] focus:border-accent/50",
+                        "focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]",
+                        "focus:outline-none transition-all duration-200",
+                        errors.type && "border-error/50"
                       )}
                       {...register("type")}
                     >
@@ -206,17 +231,17 @@ export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
                       <option value="generic">Generic</option>
                     </select>
                     {errors.type && (
-                      <p className="text-xs text-error" role="alert">
+                      <p className="text-xs text-error font-medium" role="alert">
                         {errors.type.message}
                       </p>
                     )}
                   </div>
 
                   {/* Requirements URL */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label
                       htmlFor="requirementsUrl"
-                      className="text-sm font-medium text-foreground"
+                      className="text-sm font-semibold text-foreground"
                     >
                       Requirements URL
                     </label>
@@ -225,19 +250,24 @@ export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
                       type="url"
                       placeholder="https://example.gov/requirements"
                       className={cn(
-                        "w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-muted/50",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        errors.requirementsUrl && "border-error"
+                        "w-full rounded-xl px-4 py-3 text-sm text-foreground",
+                        "bg-white/[0.04] backdrop-blur-sm",
+                        "border border-white/[0.1]",
+                        "placeholder:text-foreground-muted/40",
+                        "focus:bg-white/[0.06] focus:border-accent/50",
+                        "focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]",
+                        "focus:outline-none transition-all duration-200",
+                        errors.requirementsUrl && "border-error/50"
                       )}
                       {...register("requirementsUrl")}
                     />
                     {errors.requirementsUrl && (
-                      <p className="text-xs text-error" role="alert">
+                      <p className="text-xs text-error font-medium" role="alert">
                         {errors.requirementsUrl.message}
                       </p>
                     )}
                     <p className="text-xs text-foreground-muted">
-                      Optional. Link to appointment requirements/documentation.
+                      Optional link to appointment requirements.
                     </p>
                   </div>
                 </div>
@@ -245,21 +275,30 @@ export function AddTargetDrawer({ onSuccess }: AddTargetDrawerProps) {
             </div>
 
             {/* Active toggle */}
-            <label className="flex items-center gap-3 text-sm">
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent"
-                {...register("active")}
-              />
-              <span className="text-foreground">
-                Start monitoring immediately
-              </span>
+            <label className="flex items-center gap-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 cursor-pointer hover:bg-white/[0.04] transition-colors">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  className="peer sr-only"
+                  {...register("active")}
+                />
+                <div className="h-6 w-11 rounded-full bg-white/[0.1] peer-checked:bg-accent transition-colors" />
+                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform peer-checked:translate-x-5" />
+              </div>
+              <div>
+                <span className="text-sm font-semibold text-foreground">
+                  Start monitoring immediately
+                </span>
+                <p className="text-xs text-foreground-muted mt-0.5">
+                  Begin checking for availability right away
+                </p>
+              </div>
             </label>
           </div>
 
-          <DrawerFooter>
+          <DrawerFooter className="border-t border-white/[0.08] bg-white/[0.02]">
             <DrawerClose asChild>
-              <Button type="button" variant="secondary">
+              <Button type="button" variant="ghost">
                 Cancel
               </Button>
             </DrawerClose>

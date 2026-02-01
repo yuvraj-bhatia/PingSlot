@@ -2,61 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===========================
+   THEME VARIABLES
+   =========================== */
 :root {
   color-scheme: dark;
   
-  /* === CORE PALETTE === */
-  /* Anthracite base - deep charcoal */
-  --color-bg: 220 15% 11%;
-  --color-bg-elevated: 220 15% 14%;
-  --color-fg: 220 10% 95%;
-  --color-fg-muted: 220 10% 70%;
+  /* === McLAREN F1 INSPIRED PALETTE === */
+  /* Papaya Orange: #FF8000 (McLaren signature) */
+  /* Racing Blue: #0057B8 (McLaren blue) */
+  /* Soft Black: #0A0A0A (carbon fiber inspired) */
   
-  /* Card/surface layers */
-  --color-card: 220 15% 16%;
-  --color-card-hover: 220 15% 19%;
-  --color-muted: 220 12% 24%;
-  --color-muted-hover: 220 12% 28%;
-  --color-border: 220 12% 26%;
-  --color-border-subtle: 220 12% 20%;
+  /* Background - Soft Black */
+  --color-bg: 0 0% 4%;
+  --color-bg-elevated: 0 0% 7%;
+  /* Primary text - Light for contrast */
+  --color-fg: 30 100% 97%;
+  /* Secondary text - Muted warm grey */
+  --color-fg-muted: 30 10% 55%;
   
-  /* === ACCENT COLORS === */
-  /* Papaya Orange - Primary action color */
-  --color-accent: 24 95% 53%;
-  --color-accent-hover: 24 95% 58%;
-  --color-accent-pressed: 24 95% 48%;
-  --color-accent-subtle: 24 95% 53%;
-  --color-accent-foreground: 220 15% 10%;
+  /* Card/surface layers - Glassmorphism ready */
+  --color-card: 0 0% 8%;
+  --color-card-hover: 0 0% 11%;
+  --color-muted: 0 0% 12%;
+  --color-muted-hover: 0 0% 16%;
+  --color-border: 0 0% 15%;
+  --color-border-subtle: 0 0% 10%;
   
-  /* Teal - Secondary accent */
-  --color-teal: 175 70% 42%;
-  --color-teal-hover: 175 70% 47%;
-  --color-teal-subtle: 175 70% 42%;
-  --color-teal-foreground: 220 15% 10%;
+  /* === BRAND COLORS === */
+  /* Primary - Papaya Orange #FF8000 */
+  --color-accent: 30 100% 50%;
+  /* Orange hover - slightly darker */
+  --color-accent-hover: 28 100% 45%;
+  --color-accent-pressed: 26 100% 40%;
+  --color-accent-subtle: 30 100% 50%;
+  --color-accent-foreground: 0 0% 4%;
+  
+  /* Secondary - McLaren Racing Blue #0057B8 */
+  --color-teal: 210 100% 36%;
+  --color-teal-hover: 210 100% 30%;
+  --color-teal-subtle: 210 100% 36%;
+  --color-teal-foreground: 0 0% 100%;
   
   /* === SEMANTIC COLORS === */
-  /* Success - Green */
-  --color-success: 142 76% 45%;
-  --color-success-subtle: 142 76% 45%;
-  --color-success-bg: 142 76% 45%;
+  /* Success - Racing green */
+  --color-success: 145 70% 42%;
+  --color-success-subtle: 145 70% 42%;
+  --color-success-bg: 145 70% 42%;
   
-  /* Warning - Amber */
-  --color-warning: 38 92% 55%;
-  --color-warning-subtle: 38 92% 55%;
-  --color-warning-bg: 38 92% 55%;
+  /* Warning - using papaya orange */
+  --color-warning: 30 100% 50%;
+  --color-warning-subtle: 30 100% 50%;
+  --color-warning-bg: 30 100% 50%;
   
-  /* Error - Red */
-  --color-error: 0 84% 60%;
-  --color-error-subtle: 0 84% 60%;
-  --color-error-bg: 0 84% 60%;
+  /* Error - Racing red */
+  --color-error: 0 80% 55%;
+  --color-error-subtle: 0 80% 55%;
+  --color-error-bg: 0 80% 55%;
   
-  /* Info - Blue */
-  --color-info: 217 91% 60%;
-  --color-info-subtle: 217 91% 60%;
+  /* Info - using racing blue */
+  --color-info: 210 100% 36%;
+  --color-info-subtle: 210 100% 36%;
   
   /* === INTERACTION === */
-  --color-ring: 24 95% 53%;
-  --color-ring-offset: 220 15% 11%;
+  --color-ring: 30 100% 50%;
+  --color-ring-offset: 0 0% 4%;
+  --color-blue-glow: 215 100% 60%;
   
   /* === SPACING SCALE === */
   --space-1: 0.25rem;
@@ -82,24 +93,22 @@
   --text-4xl: 2.25rem;
   
   /* === SHADOWS === */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
-  --shadow-glow-accent: 0 0 20px -5px hsl(var(--color-accent) / 0.4);
-  --shadow-glow-teal: 0 0 20px -5px hsl(var(--color-teal) / 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 4px 8px -6px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 18px 30px -10px rgba(0, 0, 0, 0.65), 0 8px 12px -4px rgba(0, 0, 0, 0.45);
   
   /* === RADIUS === */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
+  --radius-2xl: 1.25rem;
   --radius-full: 9999px;
 }
 
 * {
-  border-color: hsl(var(--color-border));
+  border-color: #1F1F1F;
 }
 
 html {
@@ -107,36 +116,23 @@ html {
 }
 
 body {
-  background: 
-    /* Papaya orange glow - top left */
-    radial-gradient(
-      1000px circle at 10% 0%,
-      hsl(var(--color-accent) / 0.15),
-      transparent 50%
-    ),
-    /* Teal glow - bottom right */
-    radial-gradient(
-      800px circle at 90% 100%,
-      hsl(var(--color-teal) / 0.08),
-      transparent 40%
-    ),
-    /* Base gradient */
-    linear-gradient(
-      180deg, 
-      hsl(var(--color-bg)) 0%,
-      hsl(var(--color-bg-elevated)) 100%
-    );
+  background:
+    radial-gradient(900px 900px at 10% 5%, rgba(14, 162, 255, 0.25), transparent 50%),
+    radial-gradient(800px 800px at 85% 15%, rgba(34, 126, 255, 0.22), transparent 55%),
+    radial-gradient(700px 700px at 60% 80%, rgba(3, 169, 244, 0.18), transparent 60%),
+    #020202;
   background-attachment: fixed;
-  color: hsl(var(--color-fg));
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  color: #F8F4F0;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
 }
 
 /* Typography */
-h1, h2, h3, .font-display {
-  font-family: var(--font-serif), ui-serif, Georgia, serif;
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   letter-spacing: -0.02em;
   font-weight: 600;
 }
@@ -172,24 +168,81 @@ a {
   top: 1rem;
 }
 
-/* Scrollbar styling */
+/* ===========================
+   GLASSMORPHISM UTILITIES
+   =========================== */
+
+.glass,
+.glass-card,
+.content-card {
+  background: rgba(15, 15, 15, 0.95);
+  border: 1px solid #1F1F1F;
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  transition: border 0.2s ease, transform 0.25s ease;
+}
+
+.glass-card:hover,
+.content-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.blue-glow-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.blue-glow-card::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.45), transparent 45%);
+  opacity: 0.4;
+  transition: opacity 0.4s ease;
+}
+
+.blue-glow-card::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.35), transparent 55%);
+  opacity: 0.35;
+  transition: opacity 0.4s ease;
+}
+
+.blue-glow-card:hover::before,
+.blue-glow-card:hover::after {
+  opacity: 0.65;
+}
+
+/* ===========================
+   GRADIENT BUTTON STYLES
+   =========================== */
+
+/* ===========================
+   SCROLLBAR STYLING
+   =========================== */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--color-muted));
+  background: #0F0F0F;
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--color-fg-muted) / 0.3);
+  background: #1F1F1F;
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--color-accent) / 0.5);
+  background: rgba(255, 128, 0, 0.5);
 }
 
 /* Reduced motion */
@@ -204,15 +257,14 @@ a {
   }
 }
 
-/* Selection */
 ::selection {
-  background: hsl(var(--color-accent) / 0.3);
-  color: hsl(var(--color-fg));
+  background: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
 }
 
-/* ============================================================================
-   Animation Keyframes
-   ============================================================================ */
+/* ===========================
+   ANIMATION KEYFRAMES
+   =========================== */
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -259,6 +311,43 @@ a {
   to { transform: translateX(100%); }
 }
 
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 30px) scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes blueGlowPulse {
+  0%, 100% { 
+    opacity: 0.7;
+    filter: blur(80px);
+  }
+  50% { 
+    opacity: 1;
+    filter: blur(100px);
+  }
+}
+
+@keyframes electricPulse {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scaleX(0.95);
+  }
+  50% { 
+    opacity: 0.6;
+    transform: scaleX(1);
+  }
+}
+
+/* Fade in animation utility */
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
 /* Toast animations */
 [data-state="open"].animate-slideIn {
   animation: slideInToast 200ms ease-out;
@@ -298,4 +387,106 @@ a {
 
 [data-state="closed"].animate-fadeOut {
   animation: fadeOut 200ms ease-in;
+}
+
+/* ===========================
+   FORM ELEMENTS
+   =========================== */
+
+input, textarea, select {
+  background: #0F0F0F;
+  border: 1px solid #1F1F1F;
+  border-radius: var(--radius-lg);
+  color: #F8F4F0;
+  transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  background: #0F0F0F;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #666666;
+}
+
+/* ===========================
+   TABLE STYLES
+   =========================== */
+
+.table-glass {
+  background: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid #1F1F1F;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+}
+
+.table-glass thead {
+  background: rgba(15, 15, 15, 0.95);
+  border-bottom: 1px solid #1F1F1F;
+}
+
+.table-glass tbody tr {
+  border-bottom: 1px solid rgba(31, 31, 31, 0.5);
+  transition: all 0.2s ease;
+}
+
+.table-glass tbody tr:hover {
+  background: rgba(255, 128, 0, 0.05);
+}
+
+.table-glass tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* ===========================
+   BLUE GLOW UTILITIES
+   =========================== */
+
+.blue-glow {
+  box-shadow: 
+    0 0 20px rgba(0, 119, 255, 0.4),
+    0 0 40px rgba(0, 150, 255, 0.2),
+    0 0 60px rgba(0, 180, 255, 0.1);
+}
+
+.blue-glow-intense {
+  box-shadow: 
+    0 0 25px rgba(0, 119, 255, 0.6),
+    0 0 50px rgba(0, 150, 255, 0.35),
+    0 0 80px rgba(0, 180, 255, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.blue-glow-subtle {
+  box-shadow: 
+    0 0 15px rgba(0, 119, 255, 0.25),
+    0 0 30px rgba(0, 150, 255, 0.1);
+}
+
+.blue-border-glow {
+  border-color: rgba(0, 150, 255, 0.5);
+  box-shadow: 
+    0 0 15px rgba(0, 119, 255, 0.3),
+    inset 0 0 10px rgba(0, 150, 255, 0.05);
+}
+
+.blue-text-glow {
+  text-shadow: 
+    0 0 10px rgba(0, 150, 255, 0.8),
+    0 0 20px rgba(0, 119, 255, 0.5),
+    0 0 30px rgba(0, 180, 255, 0.3);
+}
+
+/* Animated blue glow */
+.blue-glow-animated {
+  animation: blueGlowPulse 3s ease-in-out infinite;
+}
+
+/* Electric line effect */
+.electric-line {
+  animation: electricPulse 2s ease-in-out infinite;
 }

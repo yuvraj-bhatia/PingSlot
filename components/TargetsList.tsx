@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ExternalLink, Eye } from "lucide-react";
+import { ExternalLink, Eye, ArrowRight } from "lucide-react";
 import { cn } from "../lib/cn";
 import { StatusBadge } from "./StatusBadge";
 import { Card, CardContent } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { SimpleTooltip } from "./ui/Tooltip";
 import type { TargetSummary } from "../lib/apiTypes";
-import { formatDateTime, formatRelativeTime } from "../lib/formatters";
+import { formatRelativeTime, formatHumanDate } from "../lib/formatters";
 
 interface TargetsListProps {
   targets: TargetSummary[];
@@ -18,7 +18,8 @@ interface TargetsListProps {
 }
 
 /**
- * Responsive targets list with table on desktop, cards on mobile.
+ * Responsive targets list with glassmorphism table on desktop, cards on mobile.
+ * Includes skeleton loading, empty state, and error state.
  */
 export function TargetsList({
   targets,
@@ -32,10 +33,28 @@ export function TargetsList({
 
   if (error) {
     return (
-      <Card className="border-error/30 bg-error/5">
-        <CardContent className="py-8 text-center">
-          <p className="text-error">Failed to load targets</p>
-          <p className="text-sm text-foreground-muted">{error.message}</p>
+      <Card variant="bordered" className="border-error/30 bg-error/5" role="alert" aria-live="assertive">
+        <CardContent className="py-10 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-error/10 border border-error/20">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-7 w-7 text-error"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="m15 9-6 6M9 9l6 6" />
+            </svg>
+          </div>
+          <p className="mt-5 text-lg font-semibold text-error">Failed to load targets</p>
+          <p className="mt-2 text-sm text-foreground-muted">{error.message}</p>
+          <p className="mt-4 text-xs text-foreground-muted">
+            Please refresh the page or try again later.
+          </p>
         </CardContent>
       </Card>
     );
@@ -43,11 +62,28 @@ export function TargetsList({
 
   if (targets.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <p className="font-medium text-foreground">No targets yet</p>
-          <p className="mt-1 text-sm text-foreground-muted">
-            Add a target to start monitoring. Your first check will appear here.
+      <Card variant="glass">
+        <CardContent className="py-16 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 border border-accent/20">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-8 w-8 text-accent"
+              aria-hidden="true"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </div>
+          <p className="mt-5 text-lg font-semibold text-foreground">No targets yet</p>
+          <p className="mt-2 text-sm text-foreground-muted">
+            Add a target to start monitoring appointment availability.
+          </p>
+          <p className="mt-1 text-xs text-foreground-muted">
+            Click the &quot;Add target&quot; button above to get started.
           </p>
         </CardContent>
       </Card>
@@ -57,91 +93,101 @@ export function TargetsList({
   return (
     <>
       {/* Desktop Table */}
-      <div className="hidden overflow-hidden rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-lg md:block">
+      <div className="hidden overflow-hidden rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.35)] md:block">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-border/50 bg-muted/30">
+          <thead className="border-b border-white/[0.08] bg-white/[0.03]">
             <tr>
-              <th scope="col" className="px-6 py-4 font-semibold text-foreground-muted">
+              <th scope="col" className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                 Name
               </th>
-              <th scope="col" className="px-6 py-4 font-semibold text-foreground-muted">
+              <th scope="col" className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                 Status
               </th>
-              <th scope="col" className="px-6 py-4 font-semibold text-foreground-muted">
+              <th scope="col" className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                 Next slot
               </th>
-              <th scope="col" className="px-6 py-4 font-semibold text-foreground-muted">
+              <th scope="col" className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                 Last checked
               </th>
-              <th scope="col" className="px-6 py-4 font-semibold text-foreground-muted">
+              <th scope="col" className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                 Last alert
               </th>
-              <th scope="col" className="px-6 py-4 font-semibold text-foreground-muted">
-                Actions
+              <th scope="col" className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
+                <span className="sr-only">Actions</span>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border/30">
-            {targets.map((target) => (
+          <tbody className="divide-y divide-white/[0.04]">
+            {targets.map((target, index) => (
               <tr
                 key={target.id}
                 className={cn(
-                  "transition-all duration-200 hover:bg-muted/40 hover:shadow-sm",
-                  highlightedIds?.has(target.id) && "animate-pulse-subtle bg-success/10 border-l-2 border-l-success"
+                  "transition-all duration-300 hover:bg-white/[0.04]",
+                  highlightedIds?.has(target.id) && "bg-success/10 border-l-2 border-l-success animate-pulse"
                 )}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <Link
                     href={`/targets/${target.id}`}
-                    className="font-semibold text-foreground hover:text-accent transition-colors"
+                    className="group flex items-center gap-2 font-semibold text-foreground hover:text-accent transition-colors"
                   >
                     {target.name}
+                    <ArrowRight className="h-3.5 w-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   </Link>
-                  <span className="ml-2 inline-flex items-center rounded-full bg-muted/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-foreground-muted">
-                    {target.type}
-                  </span>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <StatusBadge status={target.status} />
                 </td>
-                <td className="px-6 py-4 text-foreground-muted">
+                <td className="px-6 py-5 text-foreground-muted">
                   {target.nextSlotTime
-                    ? formatDateTime(target.nextSlotTime)
+                    ? formatHumanDate(target.nextSlotTime)
                     : "—"}
                 </td>
-                <td className="px-6 py-4 text-foreground-muted">
+                <td className="px-6 py-5 text-foreground-muted">
                   {target.lastCheckedAt
                     ? formatRelativeTime(target.lastCheckedAt)
                     : "Never"}
                 </td>
-                <td className="px-6 py-4">
-                  {target.lastEmailSent ? (
-                    <div className="flex items-center gap-1.5">
+                <td className="px-6 py-5">
+                  {target.lastAlertStatus ? (
+                    <span 
+                      className={cn(
+                        "inline-flex items-center gap-2 text-xs font-medium",
+                        target.lastAlertStatus === "sent" 
+                          ? "text-success" 
+                          : "text-foreground-muted"
+                      )}
+                      title={`Last alert: ${target.lastAlertStatus}`}
+                    >
                       <span
                         className={cn(
                           "h-2 w-2 rounded-full",
-                          target.lastEmailSent.sent
-                            ? "bg-success animate-pulse"
+                          target.lastAlertStatus === "sent"
+                            ? "bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]"
+                            : target.lastAlertStatus.startsWith("failed")
+                            ? "bg-error shadow-[0_0_8px_rgba(239,68,68,0.5)]"
                             : "bg-foreground-muted"
                         )}
                         aria-hidden="true"
                       />
-                      <span className="text-foreground-muted text-xs">
-                        {target.lastEmailSent.sent ? "Sent" : "Not sent"}
+                      <span className="max-w-[120px] truncate capitalize">
+                        {target.lastAlertStatus}
                       </span>
-                    </div>
+                    </span>
                   ) : (
                     <span className="text-foreground-muted">—</span>
                   )}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <div className="flex items-center gap-1">
                     <SimpleTooltip content="View details">
                       <Button
                         variant="ghost"
                         size="icon-sm"
                         asChild
-                        className="h-8 w-8"
+                        className="h-9 w-9 rounded-xl"
+                        aria-label={`View details for ${target.name}`}
                       >
                         <Link href={`/targets/${target.id}`}>
                           <Eye className="h-4 w-4" />
@@ -155,7 +201,8 @@ export function TargetsList({
                           variant="ghost"
                           size="icon-sm"
                           asChild
-                          className="h-8 w-8"
+                          className="h-9 w-9 rounded-xl"
+                          aria-label={`Open booking page for ${target.name}`}
                         >
                           <a
                             href={target.bookingUrl}
@@ -180,64 +227,66 @@ export function TargetsList({
 
       {/* Mobile Cards */}
       <div className="space-y-4 md:hidden">
-        {targets.map((target) => (
+        {targets.map((target, index) => (
           <Card
             key={target.id}
+            variant="glass"
             className={cn(
-              "transition-all duration-200 hover:shadow-lg",
-              highlightedIds?.has(target.id) && "animate-pulse-subtle border-success/50 border-l-4 shadow-lg"
+              "transition-all duration-300 hover:translate-y-[-2px]",
+              highlightedIds?.has(target.id) && "border-success/50 border-l-4 shadow-[0_0_30px_rgba(34,197,94,0.15)]"
             )}
+            style={{ animationDelay: `${index * 50}ms` }}
           >
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-4">
-                <div>
+                <div className="min-w-0 flex-1">
                   <Link
                     href={`/targets/${target.id}`}
-                    className="font-medium text-foreground hover:text-accent hover:underline"
+                    className="font-semibold text-foreground hover:text-accent transition-colors truncate block"
                   >
                     {target.name}
                   </Link>
-                  <span className="ml-2 inline-flex items-center rounded-full bg-muted px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-foreground-muted">
-                    {target.type}
-                  </span>
                 </div>
                 <StatusBadge status={target.status} />
               </div>
 
-              <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <dt className="text-xs text-foreground-muted">Next slot</dt>
-                  <dd className="text-foreground">
+              <dl className="mt-5 grid grid-cols-2 gap-4 text-sm">
+                <div className="space-y-1">
+                  <dt className="text-xs font-medium uppercase tracking-wider text-foreground-muted/70">Next slot</dt>
+                  <dd className="text-foreground font-medium">
                     {target.nextSlotTime
-                      ? formatDateTime(target.nextSlotTime)
+                      ? formatHumanDate(target.nextSlotTime)
                       : "—"}
                   </dd>
                 </div>
-                <div>
-                  <dt className="text-xs text-foreground-muted">
+                <div className="space-y-1">
+                  <dt className="text-xs font-medium uppercase tracking-wider text-foreground-muted/70">
                     Last checked
                   </dt>
-                  <dd className="text-foreground">
+                  <dd className="text-foreground font-medium">
                     {target.lastCheckedAt
                       ? formatRelativeTime(target.lastCheckedAt)
                       : "Never"}
                   </dd>
                 </div>
-                <div>
-                  <dt className="text-xs text-foreground-muted">Last alert</dt>
-                  <dd className="flex items-center gap-1.5">
-                    {target.lastEmailSent ? (
+                <div className="col-span-2 space-y-1">
+                  <dt className="text-xs font-medium uppercase tracking-wider text-foreground-muted/70">Last alert</dt>
+                  <dd className="flex items-center gap-2">
+                    {target.lastAlertStatus ? (
                       <>
                         <span
                           className={cn(
                             "h-2 w-2 rounded-full",
-                            target.lastEmailSent.sent
-                              ? "bg-success"
+                            target.lastAlertStatus === "sent"
+                              ? "bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]"
+                              : target.lastAlertStatus.startsWith("failed")
+                              ? "bg-error"
                               : "bg-foreground-muted"
                           )}
+                          aria-hidden="true"
                         />
-                        <span className="text-foreground">
-                          {target.lastEmailSent.sent ? "Sent" : "Not sent"}
+                        <span className="text-foreground font-medium capitalize">
+                          {target.lastAlertStatus}
                         </span>
                       </>
                     ) : (
@@ -247,11 +296,11 @@ export function TargetsList({
                 </div>
               </dl>
 
-              <div className="mt-4 flex items-center gap-2">
+              <div className="mt-5 flex items-center gap-3">
                 <Button variant="secondary" size="sm" asChild className="flex-1">
                   <Link href={`/targets/${target.id}`}>
-                    <Eye className="mr-1.5 h-4 w-4" />
-                    View
+                    <Eye className="mr-2 h-4 w-4" />
+                    View Details
                   </Link>
                 </Button>
                 {target.bookingUrl && (
@@ -265,9 +314,10 @@ export function TargetsList({
                       href={target.bookingUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`Open booking page for ${target.name} in new tab`}
                     >
-                      <ExternalLink className="mr-1.5 h-4 w-4" />
-                      Booking
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Book Now
                     </a>
                   </Button>
                 )}
@@ -282,25 +332,62 @@ export function TargetsList({
 
 /**
  * Skeleton loader for targets list.
+ * Shows animated placeholder while data is loading.
  */
 function TargetsListSkeleton() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4" role="status" aria-label="Loading targets">
+      {/* Desktop skeleton */}
+      <div className="hidden md:block overflow-hidden rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/[0.06]">
+        <div className="border-b border-white/[0.08] bg-white/[0.03] px-6 py-4">
+          <div className="flex gap-6">
+            {["Name", "Status", "Next slot", "Last checked", "Last alert", "Actions"].map((_, i) => (
+              <div key={i} className="h-4 w-24 rounded-lg bg-white/[0.06] animate-pulse" />
+            ))}
+          </div>
+        </div>
+        {[1, 2, 3].map((i) => (
+          <div 
+            key={i} 
+            className="flex items-center gap-6 px-6 py-5 border-b border-white/[0.04] last:border-0"
+            style={{ animationDelay: `${i * 100}ms` }}
+          >
+            <div className="h-5 w-36 rounded-lg bg-white/[0.06] animate-pulse" />
+            <div className="h-7 w-24 rounded-full bg-white/[0.06] animate-pulse" />
+            <div className="h-4 w-28 rounded-lg bg-white/[0.06] animate-pulse" />
+            <div className="h-4 w-20 rounded-lg bg-white/[0.06] animate-pulse" />
+            <div className="h-4 w-24 rounded-lg bg-white/[0.06] animate-pulse" />
+            <div className="h-9 w-20 rounded-xl bg-white/[0.06] animate-pulse" />
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile skeleton */}
       {[1, 2, 3].map((i) => (
-        <Card key={i} className="animate-pulse">
-          <CardContent className="p-4">
+        <Card 
+          key={i} 
+          variant="glass" 
+          className="animate-pulse md:hidden"
+          style={{ animationDelay: `${i * 100}ms` }}
+        >
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <div className="h-5 w-1/3 rounded bg-muted" />
-              <div className="h-6 w-20 rounded bg-muted" />
+              <div className="h-5 w-1/3 rounded-lg bg-white/[0.06]" />
+              <div className="h-7 w-24 rounded-full bg-white/[0.06]" />
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="h-4 w-24 rounded bg-muted" />
-              <div className="h-4 w-24 rounded bg-muted" />
+            <div className="mt-5 grid grid-cols-2 gap-4">
+              <div className="h-4 w-24 rounded-lg bg-white/[0.06]" />
+              <div className="h-4 w-24 rounded-lg bg-white/[0.06]" />
+              <div className="h-4 w-32 rounded-lg bg-white/[0.06] col-span-2" />
+            </div>
+            <div className="mt-5 flex gap-3">
+              <div className="h-10 flex-1 rounded-xl bg-white/[0.06]" />
+              <div className="h-10 flex-1 rounded-xl bg-white/[0.06]" />
             </div>
           </CardContent>
         </Card>
       ))}
+      <span className="sr-only">Loading targets...</span>
     </div>
   );
 }
-
