@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "../../lib/cn";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "glass" | "bordered" | "glow" | "blue-glow";
+  variant?: "default" | "glass" | "bordered" | "glow" | "compact";
 }
 
 /**
@@ -14,13 +14,13 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     const variants = {
       default: cn(
         "bg-[#0D0D0D]/95 border border-white/[0.08]",
-        "shadow-[0_15px_45px_rgba(0,0,0,0.55)]",
-        "hover:border-white/[0.18]"
+        "shadow-[0_12px_40px_rgba(0,0,0,0.5)]",
+        "hover:border-white/[0.15]"
       ),
       glass: cn(
         "bg-[#0B0B0B]/80 border border-white/[0.08]",
-        "shadow-[0_10px_30px_rgba(0,0,0,0.45)]",
-        "hover:border-white/[0.15]"
+        "shadow-[0_8px_30px_rgba(0,0,0,0.45)]",
+        "hover:border-white/[0.12]"
       ),
       bordered: cn(
         "bg-[#080808]/90 border-2 border-white/[0.1]",
@@ -29,13 +29,13 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       ),
       glow: cn(
         "bg-[#111111]/90 border border-white/[0.1]",
-        "shadow-[0_25px_60px_rgba(0,0,0,0.65)]",
+        "shadow-[0_20px_50px_rgba(0,0,0,0.6)]",
         "hover:border-white/[0.15]"
       ),
-      "blue-glow": cn(
-        "bg-[#0D0D0D]/90 border border-white/[0.1]",
-        "shadow-[0_18px_45px_rgba(0,0,0,0.55)]",
-        "hover:border-white/[0.15]"
+      compact: cn(
+        "bg-[#0A0A0A]/90 border border-white/[0.08]",
+        "shadow-[0_6px_20px_rgba(0,0,0,0.4)]",
+        "hover:border-white/[0.12]"
       ),
     };
 
@@ -57,27 +57,34 @@ Card.displayName = "Card";
 
 interface GlassmorphicCardProps extends React.HTMLAttributes<HTMLDivElement> {
   minHeight?: string;
+  size?: "default" | "compact";
 }
 
 export const GlassmorphicCard = React.forwardRef<HTMLDivElement, GlassmorphicCardProps>(
-  ({ className, children, minHeight = "auto", style, ...props }, ref) => {
+  ({ className, children, minHeight = "auto", size = "default", style, ...props }, ref) => {
+    const sizeStyles = {
+      default: "px-6 py-6",
+      compact: "px-4 py-4",
+    };
+
     return (
       <div ref={ref} className="relative group" {...props}>
-        {/* Subtle blue glow on hover */}
+        {/* Subtle glow on hover */}
         <div 
           className="absolute -inset-[1px] rounded-[1.35rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
           style={{
-            background: "linear-gradient(135deg, rgba(0, 119, 255, 0.15) 0%, transparent 50%, rgba(0, 180, 255, 0.1) 100%)",
+            background: "linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, transparent 50%, rgba(124, 58, 237, 0.08) 100%)",
             filter: "blur(8px)",
           }}
         />
         <div
           className={cn(
             "relative flex h-full w-full flex-col overflow-hidden rounded-[1.25rem]",
-            "border border-white/[0.1] bg-[#0A0A0A]/80 backdrop-blur-xl",
-            "px-6 py-6 transition-all duration-300",
-            "shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)]",
-            "hover:border-white/[0.15] hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)]",
+            "border border-white/[0.08] bg-[#0A0A0A]/85 backdrop-blur-xl",
+            "transition-all duration-300",
+            "shadow-[0_8px_28px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.04)]",
+            "hover:border-white/[0.12] hover:shadow-[0_10px_35px_rgba(0,0,0,0.5)]",
+            sizeStyles[size],
             className
           )}
           style={{ minHeight, ...style }}
@@ -168,8 +175,8 @@ export function CardFooter({
 }
 
 /**
- * KPI Card - for displaying key metrics with icon.
- * Uses GlassmorphicCard shell for consistent spacing.
+ * KPI Card - Compact design for displaying key metrics.
+ * More efficient use of space with horizontal layout option.
  */
 interface KPICardProps {
   icon: React.ReactNode;
@@ -178,6 +185,7 @@ interface KPICardProps {
   subtext?: string;
   trend?: "up" | "down" | "neutral";
   className?: string;
+  layout?: "vertical" | "horizontal";
 }
 
 export function KPICard({
@@ -187,40 +195,94 @@ export function KPICard({
   subtext,
   trend = "neutral",
   className,
+  layout = "vertical",
 }: KPICardProps) {
   const trendColors = {
     up: "text-success",
     down: "text-error",
-    neutral: "text-[#888888]",
+    neutral: "text-foreground-muted",
   };
 
-  return (
-    <GlassmorphicCard 
-      minHeight="10rem" 
-      className={className}
-    >
-      <div className="relative flex flex-1 flex-col justify-between gap-3">
-        {/* Header with icon and title */}
-        <div className="flex items-center gap-3">
+  const trendIcons = {
+    up: (
+      <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M6 9V3M6 3L3 6M6 3L9 6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    down: (
+      <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M6 3V9M6 9L3 6M6 9L9 6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    neutral: null,
+  };
+
+  if (layout === "horizontal") {
+    return (
+      <GlassmorphicCard size="compact" className={className}>
+        <div className="flex items-center gap-4">
+          {/* Icon */}
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF8000]/20 to-[#FF8000]/5 border border-[#FF8000]/30 text-[#FF8000] flex-shrink-0"
+            className="flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0"
             style={{
-              boxShadow: "0 0 20px rgba(255, 128, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
+              background: "linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 100%)",
+              border: "1px solid rgba(0, 212, 255, 0.2)",
+              boxShadow: "0 0 15px rgba(0, 212, 255, 0.1)",
             }}
           >
-            {icon}
+            <span className="text-accent">{icon}</span>
           </div>
-          <span className="text-sm font-medium text-[#888888]">
+          
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-foreground-muted uppercase tracking-wider truncate">
+              {title}
+            </p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-bold text-foreground tracking-tight">
+                {value}
+              </span>
+              {subtext && (
+                <span className={cn("flex items-center gap-1 text-xs font-medium", trendColors[trend])}>
+                  {trendIcons[trend]}
+                  {subtext}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </GlassmorphicCard>
+    );
+  }
+
+  return (
+    <GlassmorphicCard size="compact" className={className}>
+      <div className="flex flex-col gap-3">
+        {/* Header row */}
+        <div className="flex items-center justify-between gap-3">
+          <div
+            className="flex h-9 w-9 items-center justify-center rounded-xl flex-shrink-0"
+            style={{
+              background: "linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 100%)",
+              border: "1px solid rgba(0, 212, 255, 0.2)",
+              boxShadow: "0 0 12px rgba(0, 212, 255, 0.1)",
+            }}
+          >
+            <span className="text-accent">{icon}</span>
+          </div>
+          <span className="text-xs font-medium text-foreground-muted uppercase tracking-wider">
             {title}
           </span>
         </div>
-        {/* Value and subtext */}
-        <div className="flex flex-col gap-1">
-          <span className="text-[2.25rem] leading-[2.75rem] font-bold text-[#F8F4F0] tracking-tight">
+        
+        {/* Value row */}
+        <div className="flex items-end justify-between gap-2">
+          <span className="text-3xl font-bold text-foreground tracking-tight">
             {value}
           </span>
           {subtext && (
-            <span className={cn("text-xs font-medium", trendColors[trend])}>
+            <span className={cn("flex items-center gap-1 text-xs font-medium pb-1", trendColors[trend])}>
+              {trendIcons[trend]}
               {subtext}
             </span>
           )}
@@ -232,7 +294,6 @@ export function KPICard({
 
 /**
  * Dashboard Card - for displaying content sections with icon and title.
- * Uses GlassmorphicCard shell for consistent spacing.
  */
 interface DashboardCardProps {
   icon: React.ReactNode;
@@ -249,36 +310,69 @@ export function DashboardCard({
   description,
   children,
   className,
-  minHeight = "14rem",
+  minHeight = "auto",
 }: DashboardCardProps) {
   return (
     <GlassmorphicCard 
       minHeight={minHeight} 
-      className={cn("gap-6", className)}
+      className={cn("gap-4", className)}
     >
-      <div className="relative flex flex-1 flex-col justify-between gap-3">
+      <div className="flex flex-col gap-4">
         {/* Header with icon and title */}
         <div className="flex items-center gap-3">
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF8000]/20 to-[#FF8000]/5 border border-[#FF8000]/30 text-[#FF8000] flex-shrink-0"
+            className="flex h-10 w-10 items-center justify-center rounded-xl flex-shrink-0"
             style={{
-              boxShadow: "0 0 20px rgba(255, 128, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
+              background: "linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 100%)",
+              border: "1px solid rgba(0, 212, 255, 0.2)",
+              boxShadow: "0 0 15px rgba(0, 212, 255, 0.1)",
             }}
           >
-            {icon}
+            <span className="text-accent">{icon}</span>
           </div>
-          <h3 className="text-xl font-semibold leading-tight text-[#F8F4F0]">
+          <h3 className="text-lg font-semibold text-foreground">
             {title}
           </h3>
         </div>
         {/* Description/content */}
         {description && (
-          <div className="text-sm leading-relaxed text-[#888888]">
+          <p className="text-sm text-foreground-muted leading-relaxed">
             {description}
-          </div>
+          </p>
         )}
         {children}
       </div>
     </GlassmorphicCard>
+  );
+}
+
+/**
+ * Stat Card - Ultra-compact metric display
+ */
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  icon?: React.ReactNode;
+  className?: string;
+}
+
+export function StatCard({ label, value, icon, className }: StatCardProps) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-3 rounded-xl px-4 py-3",
+        "bg-white/[0.03] border border-white/[0.06]",
+        "transition-all duration-200 hover:bg-white/[0.05]",
+        className
+      )}
+    >
+      {icon && (
+        <span className="text-accent flex-shrink-0">{icon}</span>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-foreground-muted truncate">{label}</p>
+        <p className="text-lg font-semibold text-foreground">{value}</p>
+      </div>
+    </div>
   );
 }

@@ -200,3 +200,78 @@ export const StartCheckRunInputSchema = z.object({
   targetIds: z.array(z.string()).optional(),
 });
 export type StartCheckRunInput = z.infer<typeof StartCheckRunInputSchema>;
+
+// Input schema for updating a target (for form validation)
+export const UpdateTargetInputSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100, "Name too long").optional(),
+  bookingUrl: z.string().url("Must be a valid URL").startsWith("https://", "Must use HTTPS").optional(),
+  type: z.enum(["acuity", "generic", "unknown"]).optional(),
+  requirementsUrl: z
+    .union([
+      z.string().url("Must be a valid URL").startsWith("https://", "Must use HTTPS"),
+      z.literal(""),
+      z.null(),
+    ])
+    .optional()
+    .transform((val) => val === "" ? null : val),
+  alertEmail: z.string().email("Must be a valid email").optional(),
+  active: z.boolean().optional(),
+});
+
+// Type alias for form input - matches Zod schema inference
+export type UpdateTargetFormInput = {
+  name?: string;
+  bookingUrl?: string;
+  type?: "acuity" | "generic" | "unknown";
+  requirementsUrl?: string | null;
+  alertEmail?: string;
+  active?: boolean;
+};
+
+// ============================================================================
+// Booking Schemas
+// ============================================================================
+
+export const BookingStatusSchema = z.enum([
+  "pending",
+  "navigating",
+  "finding_slots",
+  "selecting",
+  "filling_form",
+  "confirming",
+  "success",
+  "failed",
+  "cancelled",
+]);
+export type BookingStatus = z.infer<typeof BookingStatusSchema>;
+
+export const BookingSessionSchema = z.object({
+  id: z.string(),
+  targetId: z.string(),
+  status: BookingStatusSchema,
+  currentStep: z.number(),
+  totalSteps: z.number().default(5),
+  screenshot: z.string().optional(),
+  error: z.string().optional(),
+  confirmation: z.object({
+    number: z.string(),
+    datetime: z.string(),
+  }).optional(),
+  startedAt: z.string(),
+  completedAt: z.string().optional(),
+});
+export type BookingSession = z.infer<typeof BookingSessionSchema>;
+
+export const UserProfileSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Must be a valid email"),
+  phone: z.string().optional(),
+});
+export type UserProfile = z.infer<typeof UserProfileSchema>;
+
+export const StartBookingInputSchema = z.object({
+  targetId: z.string(),
+  userProfile: UserProfileSchema,
+});
+export type StartBookingInput = z.infer<typeof StartBookingInputSchema>;

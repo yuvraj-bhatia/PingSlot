@@ -3,52 +3,68 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "../../lib/cn";
 import { Loader2 } from "lucide-react";
 
+/**
+ * Button variants with WCAG AA compliant focus states.
+ * Electric Cyan + Deep Violet color scheme.
+ */
 const buttonVariants = {
-  // Primary - McLaren Papaya Orange with strong glow
+  // Primary - Electric Cyan with strong glow
   primary: cn(
-    "border-2 border-[#FF8000]/30 bg-gradient-to-r from-[#FF8000] to-[#FF9933] text-[#0A0A0A]",
-    "shadow-[0_0_20px_rgba(255,128,0,0.5),0_8px_32px_rgba(255,128,0,0.35)]",
-    "hover:from-[#FF9020] hover:to-[#FFaa44] hover:shadow-[0_0_30px_rgba(255,128,0,0.6),0_12px_40px_rgba(255,128,0,0.4)]",
-    "active:scale-[0.98] active:shadow-[0_0_15px_rgba(255,128,0,0.4)]",
-    "focus-visible:ring-2 focus-visible:ring-[#FF8000] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
+    "border-2 border-cyan/30 bg-cyan text-background",
+    "shadow-[0_0_20px_rgba(0,212,255,0.5),0_8px_32px_rgba(0,212,255,0.35)]",
+    "hover:bg-cyan-light hover:shadow-[0_0_30px_rgba(0,212,255,0.6),0_12px_40px_rgba(0,212,255,0.4)]",
+    "active:scale-[0.98] active:shadow-[0_0_15px_rgba(0,212,255,0.4)]",
+    "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-background"
   ),
   // Secondary - Glass effect with subtle border
   secondary: cn(
     "bg-white/[0.06] backdrop-blur-md",
     "border border-white/20",
-    "text-[#F8F4F0]",
+    "text-[#F8F8F8]",
     "shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]",
     "hover:bg-white/[0.12] hover:border-white/30",
     "hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)]",
-    "active:scale-[0.98]"
+    "active:scale-[0.98]",
+    "focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
   ),
   // Ghost - Minimal styling
   ghost: cn(
     "text-[#888888]",
-    "hover:bg-white/[0.08] hover:text-[#F8F4F0]",
+    "hover:bg-white/[0.08] hover:text-[#F8F8F8]",
     "hover:shadow-[0_4px_16px_rgba(0,0,0,0.25)]",
-    "active:scale-[0.98]"
+    "active:scale-[0.98]",
+    "focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
   ),
   // Danger - Error/destructive actions
   danger: cn(
     "border border-error/40 bg-gradient-to-r from-error to-[#ff6b6b] text-white",
     "shadow-[0_0_15px_rgba(239,68,68,0.4),0_6px_20px_rgba(239,68,68,0.3)]",
     "hover:shadow-[0_0_25px_rgba(239,68,68,0.5),0_8px_28px_rgba(239,68,68,0.4)]",
-    "active:scale-[0.98]"
+    "active:scale-[0.98]",
+    "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
   ),
   // Success - Positive actions
   success: cn(
-    "border border-success/40 bg-gradient-to-r from-success to-[#4ade80] text-white",
-    "shadow-[0_0_15px_rgba(34,197,94,0.4),0_6px_20px_rgba(34,197,94,0.3)]",
-    "hover:shadow-[0_0_25px_rgba(34,197,94,0.5),0_8px_28px_rgba(34,197,94,0.4)]",
-    "active:scale-[0.98]"
+    "border border-success/40 bg-gradient-to-r from-success to-[#34d399] text-white",
+    "shadow-[0_0_15px_rgba(16,185,129,0.4),0_6px_20px_rgba(16,185,129,0.3)]",
+    "hover:shadow-[0_0_25px_rgba(16,185,129,0.5),0_8px_28px_rgba(16,185,129,0.4)]",
+    "active:scale-[0.98]",
+    "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
   ),
-  // Teal/Blue - Secondary accent (for info actions)
+  // Violet - Secondary accent
   teal: cn(
-    "border border-[#0077FF]/40 bg-gradient-to-r from-[#0057B8] to-[#0088FF] text-white",
-    "shadow-[0_0_15px_rgba(0,119,255,0.4),0_6px_20px_rgba(0,87,184,0.3)]",
-    "hover:shadow-[0_0_25px_rgba(0,119,255,0.5),0_8px_28px_rgba(0,87,184,0.4)]",
-    "active:scale-[0.98]"
+    "border border-[#7C3AED]/40 bg-gradient-to-r from-[#7C3AED] to-[#8B5CF6] text-white",
+    "shadow-[0_0_15px_rgba(124,58,237,0.4),0_6px_20px_rgba(124,58,237,0.3)]",
+    "hover:shadow-[0_0_25px_rgba(124,58,237,0.5),0_8px_28px_rgba(124,58,237,0.4)]",
+    "active:scale-[0.98]",
+    "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
+  ),
+  // Outline - Border only variant
+  outline: cn(
+    "border-2 border-white/20 bg-transparent text-[#F8F8F8]",
+    "hover:bg-white/[0.06] hover:border-white/30",
+    "active:scale-[0.98]",
+    "focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
   ),
 } as const;
 
@@ -70,7 +86,6 @@ export interface ButtonProps
 
 /**
  * Accessible button component with modern gradient effects and glass styling.
- * Supports loading state and polymorphic rendering via asChild.
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -82,17 +97,24 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading = false,
       disabled,
       children,
+      "aria-label": ariaLabel,
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
+    const isDisabled = disabled || isLoading;
 
     const content = asChild ? (
       children
     ) : (
       <>
-        {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {isLoading && (
+          <Loader2 
+            className="h-4 w-4 animate-spin" 
+            aria-hidden="true"
+          />
+        )}
         {children}
       </>
     );
@@ -100,18 +122,17 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
-        disabled={disabled || isLoading}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
+        aria-busy={isLoading}
+        aria-label={ariaLabel}
         className={cn(
-          // Base styles
           "inline-flex items-center justify-center gap-2",
           "rounded-xl font-semibold",
           "transition-all duration-200 ease-out",
           "focus-visible:outline-none",
-          // Disabled state - more visible but clearly inactive
-          "disabled:pointer-events-none disabled:opacity-40 disabled:saturate-50 disabled:shadow-none",
-          // Variant styles
+          "disabled:pointer-events-none disabled:opacity-50",
           buttonVariants[variant],
-          // Size styles
           buttonSizes[size],
           className
         )}
@@ -139,3 +160,19 @@ export function buttonStyles(
     buttonSizes[size]
   );
 }
+
+export const IconButton = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps & { "aria-label": string }
+>(({ className, size = "icon", ...props }, ref) => {
+  return (
+    <Button
+      ref={ref}
+      size={size}
+      className={cn("p-0", className)}
+      {...props}
+    />
+  );
+});
+
+IconButton.displayName = "IconButton";

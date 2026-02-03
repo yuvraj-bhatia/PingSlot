@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   ChevronDown,
@@ -11,6 +12,8 @@ import {
   FileText,
   Mail,
   Pencil,
+  Trash2,
+  Zap,
 } from "lucide-react";
 import { PageHeader, PageShell } from "../../../components/PageShell";
 import {
@@ -22,6 +25,9 @@ import {
 } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import { StatusBadge } from "../../../components/StatusBadge";
+import { EditTargetDrawer } from "../../../components/EditTargetDrawer";
+import { DeleteConfirmDialog } from "../../../components/DeleteConfirmDialog";
+import { Breadcrumbs } from "../../../components/Breadcrumbs";
 import { useTarget } from "../../../lib/hooks";
 import {
   formatDateTime,
@@ -214,40 +220,68 @@ export default function TargetDetailPage({ params }: TargetDetailPageProps) {
         ? "page"
         : "document";
   return (
-    <div className="min-h-[calc(100vh-8rem)]">
+    <motion.div 
+      className="min-h-[calc(100vh-8rem)]"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
       <PageHeader>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-foreground-muted hover:text-foreground transition-colors group"
-          aria-label="Return to dashboard"
-        >
-          <ArrowLeft
-            className="h-4 w-4 group-hover:-translate-x-1 transition-transform"
-            aria-hidden="true"
-          />
-          Back to dashboard
-        </Link>
+        {/* Breadcrumbs */}
+        <Breadcrumbs 
+          items={[
+            { label: "Targets", href: "/targets" },
+            { label: target.name },
+          ]}
+          className="mb-4"
+        />
 
-        <div className="mt-6 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <motion.div 
+          className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
           <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.3em] text-foreground-muted/70">
-              Target details
-            </p>
+            <div className="flex items-center gap-3">
+              <StatusBadge status={target.status} size="md" />
+              <span className="text-xs uppercase tracking-[0.2em] text-foreground-muted/70">
+                Target
+              </span>
+            </div>
             <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               {target.name}
             </h1>
-            <p className="text-sm text-foreground-muted">
-              Deep view of status, requirements, and alerts for this target.
-            </p>
           </div>
-          <Button variant="secondary" size="sm" aria-label="Edit target">
-            <Pencil className="h-4 w-4" />
-            Edit
-          </Button>
-        </div>
+          <div className="flex items-center gap-2">
+            <EditTargetDrawer
+              target={target}
+              trigger={
+                <Button variant="secondary" size="sm" aria-label="Edit target">
+                  <Pencil className="h-4 w-4" />
+                  Edit
+                </Button>
+              }
+            />
+            <DeleteConfirmDialog
+              targetId={target.id}
+              targetName={target.name}
+              trigger={
+                <Button variant="ghost" size="sm" aria-label="Delete target" className="text-foreground-muted hover:text-error">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              }
+            />
+          </div>
+        </motion.div>
       </PageHeader>
 
       <PageShell className="pb-16 space-y-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
         <Card variant="glass">
           <CardContent className="relative p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -285,6 +319,14 @@ export default function TargetDetailPage({ params }: TargetDetailPageProps) {
               </div>
 
               <div className="flex flex-col gap-3">
+                {target.status === "available" && (
+                  <Button asChild variant="success">
+                    <Link href={`/targets/${target.id}/book`}>
+                      <Zap className="h-4 w-4" />
+                      Auto-Book Now
+                    </Link>
+                  </Button>
+                )}
                 {target.bookingUrl ? (
                   <Button asChild>
                     <a
@@ -316,8 +358,14 @@ export default function TargetDetailPage({ params }: TargetDetailPageProps) {
             </div>
           </CardContent>
         </Card>
+        </motion.div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <motion.div 
+          className="grid gap-6 lg:grid-cols-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
           <Card variant="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
@@ -357,7 +405,7 @@ export default function TargetDetailPage({ params }: TargetDetailPageProps) {
                         key={index}
                         className="flex items-start gap-3 rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3"
                       >
-                        <span className="mt-2 h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_rgba(255,128,0,0.5)]" />
+                        <span className="mt-2 h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_rgba(0,212,255,0.5)]" />
                         <span className="text-sm text-foreground">{bullet}</span>
                       </li>
                     ))}
@@ -430,8 +478,13 @@ export default function TargetDetailPage({ params }: TargetDetailPageProps) {
               )}
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+        >
         <Card variant="glass">
           <CardHeader>
             <CardTitle className="flex items-center gap-3">
@@ -501,8 +554,9 @@ export default function TargetDetailPage({ params }: TargetDetailPageProps) {
             )}
           </CardContent>
         </Card>
+        </motion.div>
       </PageShell>
-    </div>
+    </motion.div>
   );
 }
 

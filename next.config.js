@@ -16,6 +16,9 @@ const nextConfig = {
   // Performance optimizations
   compress: true,
   
+  // Transpile framer-motion
+  transpilePackages: ['framer-motion'],
+  
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-toast'],

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -47,7 +47,13 @@ model Target {
   // Relations
   checks Check[]
   alerts Alert[]
+  bookings Booking[]
+  notifications Notification[]
+  requirements  Requirement?
 
+  @@index([active])
+  @@index([platform])
+  @@index([appointmentType])
   @@map("targets")
 }
 
@@ -93,6 +99,89 @@ model Alert {
   @@unique([dedupeHash])
   @@index([targetId, sentAt])
   @@map("alerts")
+}
+
+// ============================================================================
+// Bookings
+// Stores auto-booking attempts and results
+// ============================================================================
+
+model Booking {
+  id              String    @id @default(cuid())
+  targetId        String    @map("target_id")
+  status          String    // "pending" | "navigating" | "finding_slots" | "selecting" | "filling_form" | "confirming" | "success" | "failed" | "cancelled"
+  slotDateTime    DateTime? @map("slot_date_time")
+  confirmationNum String?   @map("confirmation_num")
+  screenshotUrl   String?   @map("screenshot_url")
+  errorMessage    String?   @map("error_message")
+  
+  // User profile data used for booking (JSON)
+  userProfile     String?   @map("user_profile")
+  
+  // Timing
+  startedAt       DateTime  @default(now()) @map("started_at")
+  completedAt     DateTime? @map("completed_at")
+  
+  // Relation
+  target Target @relation(fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([targetId, startedAt])
+  @@index([status])
+  @@map("bookings")
+}
+
+// ============================================================================
+// Notifications
+// Stores all notification attempts (availability alerts, booking confirmations, etc.)
+// More detailed than Alert - includes booking-related notifications
+// ============================================================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  targetId  String   @map("target_id")
+  
+  type      String   // "availability" | "booking_success" | "booking_failed" | "booking_started"
+  email     String   // Recipient email
+  subject   String   // Email subject line
+  body      String?  // Email body (plain text)
+  resendId  String?  @map("resend_id") // ID from Resend for tracking
+  
+  // Optional reference to booking if this is a booking notification
+  bookingId String?  @map("booking_id")
+  
+  sentAt    DateTime @default(now()) @map("sent_at")
+  
+  // Relation
+  target Target @relation(fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([targetId])
+  @@index([sentAt])
+  @@index([type])
+  @@map("notifications")
+}
+
+// ============================================================================
+// Requirements
+// Stores extracted requirements for appointments (what to bring, fees, etc.)
+// One requirements set per target - extracted on-demand from PDF/HTML
+// ============================================================================
+
+model Requirement {
+  id          String   @id @default(cuid())
+  targetId    String   @unique @map("target_id") // One requirements set per target
+  
+  sourceUrl   String?  @map("source_url") // URL where requirements were extracted from
+  items       String   // JSON array: [{ text, category, required, details }]
+  rawContent  String?  @map("raw_content") // Original extracted text for debugging
+  contentHash String?  @map("content_hash") // Hash to detect if source changed
+  
+  extractedAt DateTime @default(now()) @map("extracted_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relation
+  target Target @relation(fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@map("requirements")
 }
 
 // ============================================================================

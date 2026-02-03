@@ -7,6 +7,7 @@ import { StatusBadge } from "./StatusBadge";
 import { Card, CardContent } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { SimpleTooltip } from "./ui/Tooltip";
+import { TargetsEmptyState } from "./EmptyState";
 import type { TargetSummary } from "../lib/apiTypes";
 import { formatRelativeTime, formatHumanDate } from "../lib/formatters";
 
@@ -61,33 +62,7 @@ export function TargetsList({
   }
 
   if (targets.length === 0) {
-    return (
-      <Card variant="glass">
-        <CardContent className="py-16 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 border border-accent/20">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-8 w-8 text-accent"
-              aria-hidden="true"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </div>
-          <p className="mt-5 text-lg font-semibold text-foreground">No targets yet</p>
-          <p className="mt-2 text-sm text-foreground-muted">
-            Add a target to start monitoring appointment availability.
-          </p>
-          <p className="mt-1 text-xs text-foreground-muted">
-            Click the &quot;Add target&quot; button above to get started.
-          </p>
-        </CardContent>
-      </Card>
-    );
+    return <TargetsEmptyState />;
   }
 
   return (

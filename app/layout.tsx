@@ -1,26 +1,21 @@
 import "./globals.css";
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { Fraunces, Inter, Space_Grotesk, Syne } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, Syne } from "next/font/google";
 
 import { QueryProvider } from "../components/QueryProvider";
 import { ToastProvider } from "../components/ToastProvider";
 import { TooltipProvider } from "../components/ui/Tooltip";
 import { PageShell } from "../components/PageShell";
 import { Header } from "../components/Header";
+import { MobileNav } from "../components/MobileNav";
 
-const oughter = localFont({
-  src: "../fonts/Oughter.otf",
-  variable: "--font-oughter",
-  display: "swap",
-});
-
-const serif = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
+/**
+ * Typography System
+ * 
+ * Two font families for clarity and performance:
+ * - Syne: Display font for headers, hero text, brand elements
+ * - Inter: Body font for all UI text, forms, and content
+ */
 
 const sans = Inter({
   subsets: ["latin"],
@@ -35,20 +30,19 @@ const display = Syne({
   weight: ["400", "500", "600", "700", "800"],
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-});
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   title: {
     default: "PingSlot | Appointment Monitoring",
     template: "%s | PingSlot",
   },
-  description: "Signal-first appointment monitoring dashboard. Track availability, run checks, and manage alerts for appointment slots.",
-  keywords: ["appointment monitoring", "availability tracking", "appointment alerts"],
+  description: "AI-powered appointment monitoring and auto-booking. Track availability, get instant alerts, and book appointments automatically.",
+  keywords: ["appointment monitoring", "availability tracking", "appointment alerts", "auto-booking", "DMV appointments", "passport appointments"],
   authors: [{ name: "PingSlot" }],
   creator: "PingSlot",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
@@ -56,22 +50,17 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "PingSlot",
-    title: "PingSlot | Appointment Monitoring",
-    description: "Signal-first appointment monitoring dashboard",
+    title: "PingSlot | AI-Powered Appointment Monitoring",
+    description: "Never miss an appointment slot again. AI-powered monitoring and auto-booking.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PingSlot | Appointment Monitoring",
-    description: "Signal-first appointment monitoring dashboard",
+    title: "PingSlot | AI-Powered Appointment Monitoring",
+    description: "Never miss an appointment slot again. AI-powered monitoring and auto-booking.",
   },
   robots: {
     index: true,
     follow: true,
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
   },
 };
 
@@ -83,10 +72,10 @@ export default function RootLayout({
   return (
     <html 
       lang="en" 
-      className={`${oughter.variable} ${serif.variable} ${sans.variable} ${display.variable} ${spaceGrotesk.variable}`}
+      className={`${sans.variable} ${display.variable}`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="min-h-screen bg-background text-foreground antialiased font-sans">
         <QueryProvider>
           <TooltipProvider>
           <ToastProvider>
@@ -99,31 +88,34 @@ export default function RootLayout({
             <Header />
 
             {/* Main content */}
-            <main id="main-content" className="min-h-[calc(100vh-10rem)] sm:min-h-[calc(100vh-6rem)]">
+            <main id="main-content" className="min-h-[calc(100vh-10rem)] sm:min-h-[calc(100vh-6rem)] pb-20 md:pb-0">
               {children}
             </main>
 
-            {/* Footer with blue glow background but orange text theme */}
-            <footer className="relative border-t border-blue-500/20 bg-white/[0.02] backdrop-blur-xl overflow-hidden">
-              {/* Footer blue glow effects - KEEP AS IS */}
+            {/* Mobile bottom navigation */}
+            <MobileNav />
+
+            {/* Footer */}
+            <footer className="relative border-t border-white/[0.08] bg-white/[0.02] backdrop-blur-xl overflow-hidden">
+              {/* Footer glow effects */}
               <div className="absolute inset-0 pointer-events-none">
                 <div 
                   className="absolute -bottom-20 left-1/4 h-[200px] w-[400px] rounded-full blur-[80px]"
                   style={{
-                    background: "radial-gradient(ellipse, rgba(0, 119, 255, 0.25) 0%, rgba(0, 87, 184, 0.1) 50%, transparent 80%)",
+                    background: "radial-gradient(ellipse, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 50%, transparent 80%)",
                   }}
                 />
                 <div 
                   className="absolute -bottom-16 right-1/4 h-[180px] w-[350px] rounded-full blur-[70px]"
                   style={{
-                    background: "radial-gradient(ellipse, rgba(0, 180, 255, 0.2) 0%, rgba(0, 140, 220, 0.08) 50%, transparent 75%)",
+                    background: "radial-gradient(ellipse, rgba(124, 58, 237, 0.12) 0%, rgba(124, 58, 237, 0.04) 50%, transparent 75%)",
                   }}
                 />
                 {/* Top border glow line */}
                 <div 
                   className="absolute top-0 left-0 h-[1px] w-full"
                   style={{
-                    background: "linear-gradient(90deg, transparent 5%, rgba(0, 150, 255, 0.5) 30%, rgba(0, 200, 255, 0.7) 50%, rgba(0, 150, 255, 0.5) 70%, transparent 95%)",
+                    background: "linear-gradient(90deg, transparent 10%, rgba(0, 212, 255, 0.3) 30%, rgba(0, 212, 255, 0.5) 50%, rgba(0, 212, 255, 0.3) 70%, transparent 90%)",
                   }}
                 />
               </div>
@@ -131,17 +123,18 @@ export default function RootLayout({
               <PageShell className="relative py-8">
                 <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                   <div className="flex items-center gap-3">
-                    {/* Logo icon with blue glow but orange "P" */}
+                    {/* Logo icon */}
                     <div
-                      className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500/40 via-blue-400/25 to-cyan-400/15 flex items-center justify-center border border-blue-500/50"
+                      className="h-8 w-8 rounded-xl flex items-center justify-center border border-accent/30"
                       style={{ 
-                        boxShadow: "0 0 25px rgba(0, 119, 255, 0.5), 0 0 50px rgba(0, 150, 255, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1)" 
+                        background: "linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 212, 255, 0.05) 100%)",
+                        boxShadow: "0 0 20px rgba(0, 212, 255, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1)" 
                       }}
                     >
                       <span className="text-sm font-bold text-accent">P</span>
                     </div>
                     <span className="text-sm font-medium text-foreground-muted">
-                      PingSlot — Signal-first appointment monitoring
+                      PingSlot — AI-powered appointment monitoring
                     </span>
                   </div>
                   <div className="flex items-center gap-4">

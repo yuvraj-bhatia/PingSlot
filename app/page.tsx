@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Activity, Target, Clock, Bell, Zap, TrendingUp } from "lucide-react";
 import { PageShell, PageHeader, DashboardGrid, SectionHeading } from "../components/PageShell";
 import { TargetsList } from "../components/TargetsList";
@@ -97,13 +98,23 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-8rem)]">
+    <motion.div 
+      className="min-h-[calc(100vh-8rem)]"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
       <PageHeader>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 border border-[rgba(255,128,0,0.35)] bg-[rgba(255,128,0,0.1)]" style={{ boxShadow: "0 0 25px rgba(255, 128, 0, 0.15)" }}>
-              <Activity className="h-4 w-4 text-[#FF8000]" />
-              <span className="text-sm font-bold text-[#FF8000]">Dashboard</span>
+          <motion.div 
+            className="space-y-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 border border-[rgba(0,212,255,0.35)] bg-[rgba(0,212,255,0.1)]" style={{ boxShadow: "0 0 25px rgba(0, 212, 255, 0.15)" }}>
+              <Activity className="h-4 w-4 text-[#00D4FF]" />
+              <span className="text-sm font-bold text-[#00D4FF]">Dashboard</span>
             </div>
             <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
               Appointment Monitor
@@ -111,21 +122,30 @@ export default function DashboardPage() {
             <p className="max-w-xl text-base text-foreground-muted sm:text-lg">
               Track appointment availability across all your targets. Get instant alerts when slots open up.
             </p>
-          </div>
-          <div className="flex items-center gap-3">
+          </motion.div>
+          <motion.div 
+            className="flex items-center gap-3"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <AddTargetDrawer onSuccess={() => refetchTargets()} />
             <CheckNowButton
               onClick={handleCheckNow}
               isLoading={startCheckRun.isPending || checkRunLoading}
               disabled={!targets || targets.length === 0}
             />
-          </div>
+          </motion.div>
         </div>
       </PageHeader>
 
       <PageShell className="space-y-10 pb-16">
         {/* KPI Cards */}
-        <section>
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <DashboardGrid columns={4}>
             <KPICard
               icon={<Target className="h-5 w-5" />}
@@ -153,21 +173,30 @@ export default function DashboardPage() {
               subtext={stats.lastChecked ? "Automatic check" : "Never checked"}
             />
           </DashboardGrid>
-        </section>
+        </motion.section>
 
         {/* Run Summary - Only show when active */}
         {(checkRun || startCheckRun.isPending || checkRunLoading) && (
-          <section>
+          <motion.section
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             <RunSummary
               run={checkRun || null}
               isLoading={startCheckRun.isPending || checkRunLoading}
               error={checkRunError}
             />
-          </section>
+          </motion.section>
         )}
 
         {/* Targets List */}
-        <section className="space-y-6">
+        <motion.section 
+          className="space-y-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           <SectionHeading
             title="Monitoring Targets"
             description="All endpoints being monitored for availability"
@@ -186,32 +215,38 @@ export default function DashboardPage() {
             error={targetsError}
             highlightedIds={highlightedTargetIds}
           />
-        </section>
+        </motion.section>
 
         {/* Quick Tips Card - Show when no targets */}
         {!targetsLoading && (!targets || targets.length === 0) && (
-          <Card variant="glass" className="p-8">
-            <CardContent className="text-center space-y-4">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgba(255,128,0,0.1)] border border-[rgba(255,128,0,0.3)]" style={{ boxShadow: "0 0 35px rgba(255, 128, 0, 0.2)" }}>
-                <Target className="h-8 w-8 text-[#FF8000]" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold text-[#F8F4F0]">
-                  Get Started with PingSlot
-                </h3>
-                <p className="max-w-md mx-auto text-[#888888]">
-                  Add your first monitoring target to start tracking appointment availability. 
-                  You&apos;ll receive alerts as soon as slots become available.
-                </p>
-              </div>
-              <div className="flex justify-center gap-4 pt-2">
-                <AddTargetDrawer onSuccess={() => refetchTargets()} />
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <Card variant="glass" className="p-8">
+              <CardContent className="text-center space-y-4">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgba(0,212,255,0.1)] border border-[rgba(0,212,255,0.3)]" style={{ boxShadow: "0 0 35px rgba(0, 212, 255, 0.2)" }}>
+                  <Target className="h-8 w-8 text-[#00D4FF]" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-[#F8F4F0]">
+                    Get Started with PingSlot
+                  </h3>
+                  <p className="max-w-md mx-auto text-[#888888]">
+                    Add your first monitoring target to start tracking appointment availability. 
+                    You&apos;ll receive alerts as soon as slots become available.
+                  </p>
+                </div>
+                <div className="flex justify-center gap-4 pt-2">
+                  <AddTargetDrawer onSuccess={() => refetchTargets()} />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
       </PageShell>
-    </div>
+    </motion.div>
   );
 }
 

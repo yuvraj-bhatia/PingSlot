@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   useQuery,
   useMutation,
@@ -15,7 +16,11 @@ import {
   type TargetDetail,
   type CheckRunResponse,
   type CreateTargetFormInput,
+  type UpdateTargetFormInput,
   type StartCheckRunInput,
+  type BookingStatus,
+  type BookingSession,
+  type UserProfile,
 } from "./apiTypes";
 import { z } from "zod";
 
@@ -147,6 +152,59 @@ export function useToggleTargetActive() {
   });
 }
 
+const UpdateTargetResponseSchema = z.object({
+  target: TargetSummarySchema,
+});
+
+/**
+ * Update a target's configuration.
+ */
+export function useUpdateTarget() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: UpdateTargetFormInput }) => {
+      const response = await validatedRequest<{ target: TargetSummary }, typeof UpdateTargetResponseSchema>(
+        UpdateTargetResponseSchema,
+        () => apiClient.patch(`/targets/${id}`, data)
+      );
+      return response.target;
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate specific target and list
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.targets.detail(variables.id),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.targets.lists() });
+    },
+  });
+}
+
+const DeleteTargetResponseSchema = z.object({
+  success: z.boolean(),
+});
+
+/**
+ * Delete a target.
+ */
+export function useDeleteTarget() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await validatedRequest<{ success: boolean }, typeof DeleteTargetResponseSchema>(
+        DeleteTargetResponseSchema,
+        () => apiClient.delete(`/targets/${id}`)
+      );
+      return response.success;
+    },
+    onSuccess: () => {
+      // Invalidate targets list
+      queryClient.invalidateQueries({ queryKey: queryKeys.targets.lists() });
+    },
+  });
+}
+
 // ============================================================================
 // Check Run Queries & Mutations
 // ============================================================================
@@ -161,7 +219,7 @@ const StartCheckRunResponseSchema = z.object({
  * Start a new check run.
  */
 export function useStartCheckRun() {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (input: StartCheckRunInput = {}) => {
@@ -205,4 +263,242 @@ export function useCheckRun(
     },
     ...options,
   });
+}
+
+// ============================================================================
+// Booking Session Hook
+// ============================================================================
+
+interface UseBookingSessionOptions {
+  onStatusChange?: (status: BookingStatus) => void;
+  onError?: (error: string) => void;
+  onSuccess?: (confirmation: { number: string; datetime: string }) => void;
+}
+
+interface BookingSessionState {
+  sessionId: string | null;
+  status: BookingStatus;
+  currentStep: number;
+  screenshot: string | null;
+  error: string | null;
+  confirmation: { number: string; datetime: string } | null;
+  isConnected: boolean;
+}
+
+/**
+ * Hook for managing a booking session with SSE for real-time updates.
+ * 
+ * Usage:
+ * ```tsx
+ * const { start, cancel, status, screenshot, step, error, confirmation } = useBookingSession(targetId);
+ * 
+ * // Start booking
+ * start({ firstName: "John", lastName: "Doe", email: "john@example.com" });
+ * 
+ * // Cancel booking
+ * cancel();
+ * ```
+ */
+export function useBookingSession(
+  targetId: string,
+  options?: UseBookingSessionOptions
+) {
+  const [state, setState] = useState<BookingSessionState>({
+    sessionId: null,
+    status: "pending",
+    currentStep: 0,
+    screenshot: null,
+    error: null,
+    confirmation: null,
+    isConnected: false,
+  });
+
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Clean up SSE connection
+  const disconnect = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+    setState((prev) => ({ ...prev, isConnected: false }));
+  }, []);
+
+  // Connect to SSE stream
+  const connect = useCallback((sessionId: string) => {
+    disconnect();
+
+    const eventSource = new EventSource(
+      `/api/targets/${targetId}/book/${sessionId}/status`
+    );
+
+    eventSource.onopen = () => {
+      setState((prev) => ({ ...prev, isConnected: true }));
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data) as Partial<BookingSession>;
+        
+        setState((prev) => ({
+          ...prev,
+          status: data.status || prev.status,
+          currentStep: data.currentStep ?? prev.currentStep,
+          screenshot: data.screenshot || prev.screenshot,
+          error: data.error || prev.error,
+          confirmation: data.confirmation || prev.confirmation,
+        }));
+
+        // Trigger callbacks
+        if (data.status) {
+          options?.onStatusChange?.(data.status);
+        }
+        if (data.error) {
+          options?.onError?.(data.error);
+        }
+        if (data.confirmation) {
+          options?.onSuccess?.(data.confirmation);
+        }
+
+        // Close connection on terminal states
+        if (data.status === "success" || data.status === "failed" || data.status === "cancelled") {
+          disconnect();
+        }
+      } catch (err) {
+        console.error("[Booking SSE] Failed to parse message:", err);
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.error("[Booking SSE] Connection error");
+      setState((prev) => ({ ...prev, isConnected: false }));
+      // Attempt to reconnect after a delay if not in terminal state
+      setTimeout(() => {
+        if (
+          state.status !== "success" &&
+          state.status !== "failed" &&
+          state.status !== "cancelled"
+        ) {
+          connect(sessionId);
+        }
+      }, 3000);
+    };
+
+    eventSourceRef.current = eventSource;
+  }, [targetId, disconnect, options, state.status]);
+
+  // Start booking session
+  const start = useCallback(
+    async (userProfile: UserProfile) => {
+      // Reset state
+      setState({
+        sessionId: null,
+        status: "pending",
+        currentStep: 0,
+        screenshot: null,
+        error: null,
+        confirmation: null,
+        isConnected: false,
+      });
+
+      abortControllerRef.current = new AbortController();
+
+      try {
+        const response = await fetch(`/api/targets/${targetId}/book`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userProfile }),
+          signal: abortControllerRef.current.signal,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to start booking");
+        }
+
+        const data = await response.json();
+        const sessionId = data.sessionId as string;
+
+        setState((prev) => ({
+          ...prev,
+          sessionId,
+          status: "navigating",
+        }));
+
+        // Connect to SSE stream
+        connect(sessionId);
+
+        return sessionId;
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          return null;
+        }
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        setState((prev) => ({
+          ...prev,
+          status: "failed",
+          error: errorMessage,
+        }));
+        options?.onError?.(errorMessage);
+        return null;
+      }
+    },
+    [targetId, connect, options]
+  );
+
+  // Cancel booking session
+  const cancel = useCallback(async () => {
+    // Abort any pending request
+    abortControllerRef.current?.abort();
+
+    // If we have a session, send cancel request
+    if (state.sessionId) {
+      try {
+        await fetch(`/api/targets/${targetId}/book/${state.sessionId}/cancel`, {
+          method: "POST",
+        });
+      } catch (err) {
+        console.error("[Booking] Failed to cancel session:", err);
+      }
+    }
+
+    disconnect();
+
+    setState((prev) => ({
+      ...prev,
+      status: "cancelled",
+    }));
+  }, [targetId, state.sessionId, disconnect]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      disconnect();
+      abortControllerRef.current?.abort();
+    };
+  }, [disconnect]);
+
+  return {
+    // Actions
+    start,
+    cancel,
+    
+    // State
+    sessionId: state.sessionId,
+    status: state.status,
+    currentStep: state.currentStep,
+    screenshot: state.screenshot,
+    error: state.error,
+    confirmation: state.confirmation,
+    isConnected: state.isConnected,
+    
+    // Computed
+    isActive: state.status !== "pending" && 
+              state.status !== "success" && 
+              state.status !== "failed" && 
+              state.status !== "cancelled",
+    isComplete: state.status === "success",
+    hasFailed: state.status === "failed" || state.status === "cancelled",
+  };
 }

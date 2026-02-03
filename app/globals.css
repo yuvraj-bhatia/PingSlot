@@ -8,68 +8,67 @@
 :root {
   color-scheme: dark;
   
-  /* === McLAREN F1 INSPIRED PALETTE === */
-  /* Papaya Orange: #FF8000 (McLaren signature) */
-  /* Racing Blue: #0057B8 (McLaren blue) */
-  /* Soft Black: #0A0A0A (carbon fiber inspired) */
+  /* === ELECTRIC CYAN + DEEP VIOLET PALETTE === */
+  /* Primary: Electric Cyan #00D4FF */
+  /* Secondary: Deep Violet #7C3AED */
+  /* Background: Rich Black #0A0A0A */
   
-  /* Background - Soft Black */
+  /* Background - Rich Black */
   --color-bg: 0 0% 4%;
   --color-bg-elevated: 0 0% 7%;
   /* Primary text - Light for contrast */
-  --color-fg: 30 100% 97%;
-  /* Secondary text - Muted warm grey */
-  --color-fg-muted: 30 10% 55%;
+  --color-fg: 0 0% 97%;
+  /* Secondary text - Muted grey */
+  --color-fg-muted: 0 0% 53%;
   
   /* Card/surface layers - Glassmorphism ready */
-  --color-card: 0 0% 8%;
-  --color-card-hover: 0 0% 11%;
+  --color-card: 0 0% 6%;
+  --color-card-hover: 0 0% 9%;
   --color-muted: 0 0% 12%;
   --color-muted-hover: 0 0% 16%;
-  --color-border: 0 0% 15%;
-  --color-border-subtle: 0 0% 10%;
+  --color-border: 0 0% 12%;
+  --color-border-subtle: 0 0% 9%;
   
   /* === BRAND COLORS === */
-  /* Primary - Papaya Orange #FF8000 */
-  --color-accent: 30 100% 50%;
-  /* Orange hover - slightly darker */
-  --color-accent-hover: 28 100% 45%;
-  --color-accent-pressed: 26 100% 40%;
-  --color-accent-subtle: 30 100% 50%;
+  /* Primary - Electric Cyan #00D4FF */
+  --color-accent: 192 100% 50%;
+  /* Cyan hover - slightly lighter */
+  --color-accent-hover: 192 100% 55%;
+  --color-accent-pressed: 192 100% 45%;
+  --color-accent-subtle: 192 100% 50%;
   --color-accent-foreground: 0 0% 4%;
   
-  /* Secondary - McLaren Racing Blue #0057B8 */
-  --color-teal: 210 100% 36%;
-  --color-teal-hover: 210 100% 30%;
-  --color-teal-subtle: 210 100% 36%;
+  /* Secondary - Deep Violet #7C3AED */
+  --color-teal: 262 83% 58%;
+  --color-teal-hover: 262 83% 52%;
+  --color-teal-subtle: 262 83% 58%;
   --color-teal-foreground: 0 0% 100%;
   
   /* === SEMANTIC COLORS === */
-  /* Success - Racing green */
-  --color-success: 145 70% 42%;
-  --color-success-subtle: 145 70% 42%;
-  --color-success-bg: 145 70% 42%;
+  /* Success - Emerald green */
+  --color-success: 160 84% 39%;
+  --color-success-subtle: 160 84% 39%;
+  --color-success-bg: 160 84% 39%;
   
-  /* Warning - using papaya orange */
-  --color-warning: 30 100% 50%;
-  --color-warning-subtle: 30 100% 50%;
-  --color-warning-bg: 30 100% 50%;
+  /* Warning - Amber */
+  --color-warning: 38 92% 50%;
+  --color-warning-subtle: 38 92% 50%;
+  --color-warning-bg: 38 92% 50%;
   
-  /* Error - Racing red */
-  --color-error: 0 80% 55%;
-  --color-error-subtle: 0 80% 55%;
-  --color-error-bg: 0 80% 55%;
+  /* Error - Rose red */
+  --color-error: 0 84% 60%;
+  --color-error-subtle: 0 84% 60%;
+  --color-error-bg: 0 84% 60%;
   
-  /* Info - using racing blue */
-  --color-info: 210 100% 36%;
-  --color-info-subtle: 210 100% 36%;
+  /* Info - using cyan */
+  --color-info: 192 100% 50%;
+  --color-info-subtle: 192 100% 50%;
   
   /* === INTERACTION === */
-  --color-ring: 30 100% 50%;
+  --color-ring: 192 100% 50%;
   --color-ring-offset: 0 0% 4%;
-  --color-blue-glow: 215 100% 60%;
   
-  /* === SPACING SCALE === */
+  /* === SPACING SCALE (8px grid) === */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -81,16 +80,6 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --space-20: 5rem;
-  
-  /* === TYPOGRAPHY === */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
   
   /* === SHADOWS === */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.55);
@@ -107,34 +96,33 @@
   --radius-full: 9999px;
 }
 
-* {
-  border-color: #1F1F1F;
-}
-
 html {
   scroll-behavior: smooth;
 }
 
 body {
   background:
-    radial-gradient(900px 900px at 10% 5%, rgba(14, 162, 255, 0.25), transparent 50%),
-    radial-gradient(800px 800px at 85% 15%, rgba(34, 126, 255, 0.22), transparent 55%),
-    radial-gradient(700px 700px at 60% 80%, rgba(3, 169, 244, 0.18), transparent 60%),
-    #020202;
+    radial-gradient(900px 900px at 10% 5%, rgba(0, 212, 255, 0.06), transparent 50%),
+    radial-gradient(800px 800px at 85% 15%, rgba(124, 58, 237, 0.05), transparent 55%),
+    radial-gradient(700px 700px at 60% 80%, rgba(124, 58, 237, 0.03), transparent 60%),
+    #0A0A0A;
   background-attachment: fixed;
-  color: #F8F4F0;
-  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  color: #F8F8F8;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
 }
 
-/* Typography */
+/* Typography - Consolidated to 2 font families */
 h1, h2, h3, h4, h5, h6, .font-display {
-  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: var(--font-display), Syne, system-ui, -apple-system, sans-serif;
   letter-spacing: -0.02em;
   font-weight: 600;
+}
+
+body, p, span, div, input, textarea, select, button, a {
+  font-family: var(--font-sans), Inter, system-ui, -apple-system, sans-serif;
 }
 
 a {
@@ -142,10 +130,28 @@ a {
   text-decoration: none;
 }
 
-/* Focus styles */
+/* Focus styles - WCAG AA compliant */
 :focus-visible {
   outline: 2px solid hsl(var(--color-ring));
   outline-offset: 2px;
+}
+
+/* Enhanced focus for interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #00D4FF;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.15);
+}
+
+/* High contrast focus for dark backgrounds */
+.focus-ring-white:focus-visible {
+  outline-color: white;
 }
 
 /* Skip link for accessibility */
@@ -158,7 +164,7 @@ a {
   background: hsl(var(--color-accent));
   color: hsl(var(--color-accent-foreground));
   padding: 0.5rem 1rem;
-  font-size: var(--text-sm);
+  font-size: 0.875rem;
   font-weight: 600;
   transition: top 200ms ease;
   box-shadow: var(--shadow-lg);
@@ -175,52 +181,20 @@ a {
 .glass,
 .glass-card,
 .content-card {
-  background: rgba(15, 15, 15, 0.95);
-  border: 1px solid #1F1F1F;
+  background: rgba(15, 15, 15, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-xl);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
-  transition: border 0.2s ease, transform 0.25s ease;
+  transition: border-color 0.2s ease, transform 0.25s ease;
 }
 
 .glass-card:hover,
 .content-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-1px);
 }
-
-.blue-glow-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.blue-glow-card::before {
-  content: "";
-  position: absolute;
-  inset: -10%;
-  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.45), transparent 45%);
-  opacity: 0.4;
-  transition: opacity 0.4s ease;
-}
-
-.blue-glow-card::after {
-  content: "";
-  position: absolute;
-  inset: -20%;
-  background: radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.35), transparent 55%);
-  opacity: 0.35;
-  transition: opacity 0.4s ease;
-}
-
-.blue-glow-card:hover::before,
-.blue-glow-card:hover::after {
-  opacity: 0.65;
-}
-
-/* ===========================
-   GRADIENT BUTTON STYLES
-   =========================== */
 
 /* ===========================
    SCROLLBAR STYLING
@@ -232,7 +206,7 @@ a {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0F0F0F;
+  background: #0A0A0A;
   border-radius: var(--radius-full);
 }
 
@@ -242,10 +216,10 @@ a {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 128, 0, 0.5);
+  background: rgba(0, 212, 255, 0.5);
 }
 
-/* Reduced motion */
+/* Reduced motion - WCAG compliance */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -255,10 +229,32 @@ a {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  
+  /* Keep essential visual feedback */
+  .animate-pulse,
+  .animate-ping {
+    animation: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: 0 0% 30%;
+    --color-fg-muted: 0 0% 70%;
+  }
+  
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+  }
 }
 
 ::selection {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(0, 212, 255, 0.25);
   color: #FFFFFF;
 }
 
@@ -311,36 +307,14 @@ a {
   to { transform: translateX(100%); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(30px, 30px) scale(1.05); }
-}
-
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-@keyframes blueGlowPulse {
-  0%, 100% { 
-    opacity: 0.7;
-    filter: blur(80px);
-  }
-  50% { 
-    opacity: 1;
-    filter: blur(100px);
-  }
-}
-
-@keyframes electricPulse {
-  0%, 100% { 
-    opacity: 0.3;
-    transform: scaleX(0.95);
-  }
-  50% { 
-    opacity: 0.6;
-    transform: scaleX(1);
-  }
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
 }
 
 /* Fade in animation utility */
@@ -394,17 +368,17 @@ a {
    =========================== */
 
 input, textarea, select {
-  background: #0F0F0F;
-  border: 1px solid #1F1F1F;
+  background: rgba(15, 15, 15, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
-  color: #F8F4F0;
+  color: #F8F8F8;
   transition: all 0.2s ease;
 }
 
 input:focus, textarea:focus, select:focus {
-  background: #0F0F0F;
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12);
+  background: rgba(15, 15, 15, 0.95);
+  border-color: rgba(0, 212, 255, 0.5);
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1);
   outline: none;
 }
 
@@ -419,23 +393,23 @@ input::placeholder, textarea::placeholder {
 .table-glass {
   background: rgba(15, 15, 15, 0.85);
   backdrop-filter: blur(20px);
-  border: 1px solid #1F1F1F;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-2xl);
   overflow: hidden;
 }
 
 .table-glass thead {
   background: rgba(15, 15, 15, 0.95);
-  border-bottom: 1px solid #1F1F1F;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .table-glass tbody tr {
-  border-bottom: 1px solid rgba(31, 31, 31, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   transition: all 0.2s ease;
 }
 
 .table-glass tbody tr:hover {
-  background: rgba(255, 128, 0, 0.05);
+  background: rgba(0, 212, 255, 0.05);
 }
 
 .table-glass tbody tr:last-child {
@@ -443,50 +417,45 @@ input::placeholder, textarea::placeholder {
 }
 
 /* ===========================
-   BLUE GLOW UTILITIES
+   GLOW UTILITIES
    =========================== */
 
-.blue-glow {
+.glow-cyan {
   box-shadow: 
-    0 0 20px rgba(0, 119, 255, 0.4),
-    0 0 40px rgba(0, 150, 255, 0.2),
-    0 0 60px rgba(0, 180, 255, 0.1);
+    0 0 20px rgba(0, 212, 255, 0.4),
+    0 0 40px rgba(0, 212, 255, 0.2),
+    0 0 60px rgba(0, 212, 255, 0.1);
 }
 
-.blue-glow-intense {
+.glow-cyan-subtle {
   box-shadow: 
-    0 0 25px rgba(0, 119, 255, 0.6),
-    0 0 50px rgba(0, 150, 255, 0.35),
-    0 0 80px rgba(0, 180, 255, 0.2),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    0 0 15px rgba(0, 212, 255, 0.25),
+    0 0 30px rgba(0, 212, 255, 0.1);
 }
 
-.blue-glow-subtle {
+.glow-violet {
   box-shadow: 
-    0 0 15px rgba(0, 119, 255, 0.25),
-    0 0 30px rgba(0, 150, 255, 0.1);
+    0 0 20px rgba(124, 58, 237, 0.4),
+    0 0 40px rgba(124, 58, 237, 0.2);
 }
 
-.blue-border-glow {
-  border-color: rgba(0, 150, 255, 0.5);
+.glow-violet-subtle {
   box-shadow: 
-    0 0 15px rgba(0, 119, 255, 0.3),
-    inset 0 0 10px rgba(0, 150, 255, 0.05);
+    0 0 15px rgba(124, 58, 237, 0.25),
+    0 0 30px rgba(124, 58, 237, 0.1);
 }
 
-.blue-text-glow {
-  text-shadow: 
-    0 0 10px rgba(0, 150, 255, 0.8),
-    0 0 20px rgba(0, 119, 255, 0.5),
-    0 0 30px rgba(0, 180, 255, 0.3);
-}
+/* ===========================
+   SKELETON LOADING
+   =========================== */
 
-/* Animated blue glow */
-.blue-glow-animated {
-  animation: blueGlowPulse 3s ease-in-out infinite;
-}
-
-/* Electric line effect */
-.electric-line {
-  animation: electricPulse 2s ease-in-out infinite;
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
 }
